@@ -1,8 +1,8 @@
 {
-	"name": "Awesome Extension",
+	"name": "Lang Swiper",
 	"version": "0.0.0",
 	"description": "An awesome new browser extension",
-	"homepage_url": "https://github.com/fregante/browser-extension-template",
+	"homepage_url": "https://github.com/so-dewy/lang-swiper",
 	"manifest_version": 3,
 	"minimum_chrome_version": "100",
 	"browser_specific_settings": {
@@ -12,20 +12,26 @@
 		}
 	},
 	"icons": {
-		"128": "icon.png"
+    "16": "./images/get_started16.png",
+    "32": "./images/get_started32.png",
+    "48": "./images/get_started48.png",
+    "128": "./images/get_started128.png"
 	},
 	"permissions": [
-		"storage"
+		"storage",
+		"contextMenus",
+		"activeTab",
+		"clipboardWrite"
 	],
 	"host_permissions": [
 		"https://github.com/*"
 	],
 	"content_scripts": [
 		{
-			"matches": [ "https://github.com/fregante/browser-extension-template/*" ],
+			"matches": [ "http://*/*" ],
 			"js": [ "content.js" ],
 			"css": [ "content.css" ],
-			"run_at": "document_end"
+			"run_at": "document_start"
 		}
 	],
 	"options_ui": {
@@ -35,5 +41,14 @@
 	"background": {
 		"service_worker": "background.js",
 		"type": "module"
+	},
+	"action": {
+	  "default_popup": "popup.html",
+	  "default_icon": {
+		"16": "./images/get_started16.png",
+		"32": "./images/get_started32.png",
+		"48": "./images/get_started48.png",
+		"128": "./images/get_started128.png"
+	  }
 	}
 }
