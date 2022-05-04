@@ -28,10 +28,10 @@
 	],
 	"content_scripts": [
 		{
-			"matches": [ "http://*/*" ],
+			"matches": [ "<all_urls>" ],
 			"js": [ "content.js" ],
 			"css": [ "content.css" ],
-			"run_at": "document_start"
+			"run_at": "document_end"
 		}
 	],
 	"options_ui": {
@@ -50,5 +50,11 @@
 		"48": "./images/get_started48.png",
 		"128": "./images/get_started128.png"
 	  }
-	}
+	},
+	"web_accessible_resources": [
+		{
+			"resources": ["dictionaries/cedict_1_0_ts_utf-8_mdbg.txt"],
+			"matches": ["<all_urls>"]
+	  	}
+	]	  
 }
