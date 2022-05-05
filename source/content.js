@@ -1,4 +1,7 @@
 import optionsStorage from './options-storage.js';
+import { createRoot } from 'react-dom/client';
+import Tooltip from 'rc-tooltip';
+import 'rc-tooltip/assets/bootstrap_white.css'
 
 const dictionary = {};
 const notice = document.createElement('div');
@@ -96,8 +99,6 @@ export async function loadDictionary() {
 async function init() {
 	const options = await optionsStorage.getAll();
 	const color = 'rgb(' + options.colorRed + ', ' + options.colorGreen + ',' + options.colorBlue + ')';
-	const text = options.text;
-	notice.innerHTML = text;
 	document.body.append(notice);
 	notice.id = 'text-notice';
 	notice.style.border = '2px solid ' + color;
@@ -107,3 +108,17 @@ async function init() {
 }
 
 init();
+
+function App() {
+  console.log("hello");
+  return <div>
+    Hello World
+
+    <Tooltip trigger={['click']} overlay={<span>tooltip</span>}>
+      <a href="#">hover</a>
+    </Tooltip>
+  </div>;
+}
+const root = createRoot(notice);
+
+root.render(<App />);
