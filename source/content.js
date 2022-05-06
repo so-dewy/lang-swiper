@@ -52,13 +52,11 @@ function synthesyseWordSound(word) {
   speechSynthesis.speak(utterance);
 }
 
-const tippyInstances = tippy('.word-tooltip', {
+createSingleton(tippy('.word-tooltip'), {
+  theme: 'light-border',
+  allowHTML: true,
   interactive: true,
   appendTo: () => document.body
-});
-const singleton = createSingleton(tippyInstances, {
-  theme: 'light-border',
-  allowHTML: true
 });
 
 function translateWord(word) {
