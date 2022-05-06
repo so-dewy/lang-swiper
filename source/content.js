@@ -1,19 +1,19 @@
-import optionsStorage from './options-storage.js';
-import { createRoot } from 'react-dom/client';
-import Tooltip from 'rc-tooltip';
-import 'rc-tooltip/assets/bootstrap_white.css'
+import tippy, {createSingleton} from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/themes/light-border.css';
 
 const dictionary = {};
-const notice = document.createElement('div');
 
 const segmenter = new Intl.Segmenter(['zh'], {
   granularity: 'word',
 });
 
 function textNodesUnder(el){
-  var n, a = [], walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-  while (n = walk.nextNode()) a.push(n);
-  return a;
+  let textNode;
+  const textNodes = [];
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+  while (textNode = walk.nextNode()) textNodes.push(textNode);
+  return textNodes;
 }
 
 textNodesUnder(document).forEach(node => {
@@ -25,15 +25,18 @@ textNodesUnder(document).forEach(node => {
   for (word of words) {
     const wordSpan = document.createElement('span');
     wordSpan.textContent = word.segment;
+    wordSpan.className = "word-tooltip";
     wordSpan.after(span);
     span.appendChild(wordSpan);
     node.after(span);
     node.remove();
 
     wordSpan.addEventListener("mouseenter", event => {
-      const word = event.target.textContent;
-      synthesyseWordSound(word);
-      notice.innerHTML = translateWord(word);
+      const word = event.target;
+      synthesyseWordSound(word.textContent);
+
+      word._tippy.setContent(translateWord(word.textContent));
+      word._tippy.show();
       
       event.target.style.color = "orange";
     }, false);
@@ -49,9 +52,17 @@ function synthesyseWordSound(word) {
   speechSynthesis.speak(utterance);
 }
 
+const tippyInstances = tippy('.word-tooltip', {
+  interactive: true,
+  appendTo: () => document.body
+});
+const singleton = createSingleton(tippyInstances, {
+  theme: 'light-border',
+  allowHTML: true
+});
+
 function translateWord(word) {
   const dictionaryEntry = dictionary[word];
-  console.log(dictionaryEntry);
   if (!dictionaryEntry) {
     if (word.length == 1) {
       return`${word}: No availible translation`;
@@ -97,28 +108,7 @@ export async function loadDictionary() {
 }
 
 async function init() {
-	const options = await optionsStorage.getAll();
-	const color = 'rgb(' + options.colorRed + ', ' + options.colorGreen + ',' + options.colorBlue + ')';
-	document.body.append(notice);
-	notice.id = 'text-notice';
-	notice.style.border = '2px solid ' + color;
-	notice.style.color = color;
-
   await loadDictionary();
 }
 
 init();
-
-function App() {
-  console.log("hello");
-  return <div>
-    Hello World
-
-    <Tooltip trigger={['click']} overlay={<span>tooltip</span>}>
-      <a href="#">hover</a>
-    </Tooltip>
-  </div>;
-}
-const root = createRoot(notice);
-
-root.render(<App />);
