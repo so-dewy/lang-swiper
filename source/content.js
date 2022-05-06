@@ -35,7 +35,7 @@ textNodesUnder(document).forEach(node => {
       const word = event.target;
       synthesyseWordSound(word.textContent);
 
-      word._tippy.setContent(translateWord(word.textContent));
+      word._tippy.setContent(`<div style="max-height: 40vh; overflow-y: auto;">${translateWord(word.textContent)}</div>`);
       word._tippy.show();
       
       event.target.style.color = "orange";
@@ -56,6 +56,7 @@ createSingleton(tippy('.word-tooltip'), {
   theme: 'light-border',
   allowHTML: true,
   interactive: true,
+  // interactiveDebounce: 999999,
   appendTo: () => document.body
 });
 
@@ -63,19 +64,18 @@ function translateWord(word) {
   const dictionaryEntry = dictionary[word];
   if (!dictionaryEntry) {
     if (word.length == 1) {
-      return`${word}: No availible translation`;
+      return`<b>${word}</b> <br>No availible translation`;
     }
     if (word.length > 1) {
       const wordParts = word.split('');
       const wordPartsTranslations = wordParts.map(wordPart => translateWord(wordPart)).join("<br>");
       return wordPartsTranslations;
     }
-  } else if (dictionaryEntry.length) {
-    const translation = dictionaryEntry.map(el => el.translations.join("<br>")).join("<br>");
-    return `${word}: ${translation}`;
   } else {
-    const translation = dictionaryEntry.translations.join("<br>");
-    return `${word}: ${translation}`;
+    const translation = dictionaryEntry.length ? 
+      dictionaryEntry.map(el => el.translations.map(el => `<li style="list-style-type:circle;" >${el}</li>`).join("")).join("") 
+      : dictionaryEntry.translations.map(el => `<li style="list-style-type:circle;" >${el}</li>`).join("");
+    return `<b>${word} ${dictionaryEntry.length ? dictionaryEntry[0].pinyin : dictionaryEntry.pinyin}</b> <br><ul style="padding-left: 20px;list-style-type:circle;">${translation}</ul>`;
   }
 }
 
