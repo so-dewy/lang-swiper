@@ -46,7 +46,7 @@ getAllTextNodes().forEach(node => {
       synthesyseWordSound(word.textContent);
 
       word._tippy.setContent(
-        <div style={{maxHeight: "20vh", minWidth: 200, overflowY: "auto" }}>
+        <div style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
           { translateWord(word.textContent) } 
         </div>
       );
@@ -78,8 +78,8 @@ createSingleton(tippy(".word-tooltip"), {
 
 const openTranslationPopup = (url) => {
   const currentWindow = window;
-  const width = 500;
-  const height = 400;
+  const width = 1000;
+  const height = 500;
   const left = currentWindow.screenX + (window.outerWidth - width) / 2;
   const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
   currentWindow.open(url, "", `width=${width},height=${height},left=${left},top=${top}`);
@@ -96,7 +96,12 @@ function translateWord(word) {
       );
     }
     if (word.length > 1) {
-      const wordParts = word.split('');
+      const wordSet = new Set();
+      const wordParts = word.split('').filter(x => {
+        const isADuplicate = wordSet.has(x);
+        if (!isADuplicate) wordSet.add(x);
+        return !isADuplicate;
+      });
       const wordPartsTranslations = wordParts.map(wordPart => (
         <>
           { translateWord(wordPart) }
@@ -107,7 +112,7 @@ function translateWord(word) {
     }
   } else {
     const translation = dictionaryEntry.length ? 
-    dictionaryEntry.map(el => el.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el}</li>)).flat()
+      dictionaryEntry.flatMap(el => el.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>))
     : dictionaryEntry.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>);
 
     const encodedWord = encodeURIComponent(word);
