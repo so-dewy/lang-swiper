@@ -30,6 +30,7 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"dom-chef": "^5.1.0",
 		"segmentit": "^2.0.3",
 		"tippy.js": "^6.3.7",
 		"webext-base-css": "^1.4.0",

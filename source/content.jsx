@@ -1,3 +1,4 @@
+import React from 'dom-chef';
 import tippy, {createSingleton} from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
@@ -13,7 +14,7 @@ function getAllTextNodes() {
   const textNodes = [];
   const walk = document.createTreeWalker(document, NodeFilter.SHOW_TEXT);
   while (textNode = walk.nextNode()) {
-    // Filter out empty space nodes and nodes withouth mandarin
+    // Filter out empty space nodes and nodes without mandarin
     if (/^\s+$/.test(textNode.textContent) || !(/\p{Script=Han}/u.test(textNode.textContent))) continue;
 
     textNodes.push(textNode);
@@ -34,16 +35,21 @@ getAllTextNodes().forEach(node => {
     wordSpan.after(span);
     span.appendChild(wordSpan);
 
-    if (punctuation.indexOf(word.segment)!=-1) continue;
+    if (punctuation.indexOf(word.segment) != -1) continue;
 
     wordSpan.className = "word-tooltip";
-    wordSpan.addEventListener("mouseenter", event => {
+    wordSpan.addEventListener("mouseenter", event => {      
       const word = event.target;
-      console.log(word.textContent);
-      console.log(/\p{Script=Han}/u.test(word.nodeValue));
-      console.log(/\p{Script=Han}/u.test(word.textContent));
-      console.log(/^\s+$/.test(word.nodeValue));
-      console.log(/^\s+$/.test(word.textContent));
+
+      // const currentWindow = window;
+      
+      // const url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${encodeURIComponent(word.textContent)}%0A&op=translate`;
+      // const width = 500;
+      // const height = 400;
+      // const left = currentWindow.screenX + (window.outerWidth - width) / 2;
+      // const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
+      // const title = `WINDOW TITLE`;
+      // currentWindow.open(url, title, `width=${width},height=${height},left=${left},top=${top}`);
       
       synthesyseWordSound(word.textContent);
 
@@ -94,6 +100,7 @@ function translateWord(word) {
 }
 
 export async function loadDictionary() {
+  const startTime = Date.now();
   console.log("Loading zh-en dictionary into memory")
   const dictionaryRaw = await fetch(chrome.runtime.getURL('dictionaries/cedict_1_0_ts_utf-8_mdbg.txt'));
   const lines = (await dictionaryRaw.text()).split('\n');
@@ -115,7 +122,9 @@ export async function loadDictionary() {
       dictionary[simplified] = entryList;
     }
   }
-  console.log("Finished loading zh-en dictionary")
+  const loadTime = (Date.now() - startTime) / 1000; 
+  console.log(`Finished loading zh-en dictionary in ${loadTime}s`)
+
   return dictionary;
 }
 
