@@ -8,31 +8,43 @@ const segmenter = new Intl.Segmenter(['zh'], {
   granularity: 'word',
 });
 
-function textNodesUnder(el){
+function getAllTextNodes() {
   let textNode;
   const textNodes = [];
-  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-  while (textNode = walk.nextNode()) textNodes.push(textNode);
+  const walk = document.createTreeWalker(document, NodeFilter.SHOW_TEXT);
+  while (textNode = walk.nextNode()) {
+    // Filter out empty space nodes and nodes withouth mandarin
+    if (/^\s+$/.test(textNode.textContent) || !(/\p{Script=Han}/u.test(textNode.textContent))) continue;
+
+    textNodes.push(textNode);
+  }
   return textNodes;
 }
 
-textNodesUnder(document).forEach(node => {
-  const mandarin = node.textContent;
-  // const mandarin = node.textContent.split("").filter(char => /\p{Script=Han}/u.test(char)).join("");
+const punctuation = ["，", ".", "!", "?", "。"];
+
+getAllTextNodes().forEach(node => {
+  const mandarin = node.textContent.trim();
   const span = document.createElement('span');
   // const words = segmentit.doSegment(mandarin, { simple: true, stripPunctuation: true });
   const words = Array.from(segmenter.segment(mandarin));
   for (word of words) {
     const wordSpan = document.createElement('span');
     wordSpan.textContent = word.segment;
-    wordSpan.className = "word-tooltip";
     wordSpan.after(span);
     span.appendChild(wordSpan);
-    node.after(span);
-    node.remove();
 
+    if (punctuation.indexOf(word.segment)!=-1) continue;
+
+    wordSpan.className = "word-tooltip";
     wordSpan.addEventListener("mouseenter", event => {
       const word = event.target;
+      console.log(word.textContent);
+      console.log(/\p{Script=Han}/u.test(word.nodeValue));
+      console.log(/\p{Script=Han}/u.test(word.textContent));
+      console.log(/^\s+$/.test(word.nodeValue));
+      console.log(/^\s+$/.test(word.textContent));
+      
       synthesyseWordSound(word.textContent);
 
       word._tippy.setContent(`<div style="max-height: 40vh; overflow-y: auto;">${translateWord(word.textContent)}</div>`);
@@ -44,6 +56,8 @@ textNodesUnder(document).forEach(node => {
       event.target.style.color = "";
     }, false);
   }
+  node.after(span);
+  node.remove();
 });
 
 function synthesyseWordSound(word) {
