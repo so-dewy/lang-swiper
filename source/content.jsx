@@ -2,6 +2,9 @@ import React from 'dom-chef';
 import tippy, {createSingleton} from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
+import { GoogleTranslateSvg } from './logos/google-translate';
+import { BaiduTranslateSvg } from './logos/baidu';
+import { GlosbeTranslateSvg } from './logos/glosbe';
 
 const dictionary = {};
 
@@ -22,7 +25,7 @@ function getAllTextNodes() {
   return textNodes;
 }
 
-const punctuation = ["，", ".", "!", "?", "。"];
+const punctuation = ["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"];
 
 getAllTextNodes().forEach(node => {
   const mandarin = node.textContent.trim();
@@ -35,25 +38,18 @@ getAllTextNodes().forEach(node => {
     wordSpan.after(span);
     span.appendChild(wordSpan);
 
-    if (punctuation.indexOf(word.segment) != -1) continue;
+    if (punctuation.indexOf(word.segment) != -1 || !(/\p{Script=Han}/u.test(word.segment))) continue;
 
     wordSpan.className = "word-tooltip";
-    wordSpan.addEventListener("mouseenter", event => {      
-      const word = event.target;
-
-      // const currentWindow = window;
-      
-      // const url = `https://translate.google.com/?sl=zh-CN&tl=en&text=${encodeURIComponent(word.textContent)}%0A&op=translate`;
-      // const width = 500;
-      // const height = 400;
-      // const left = currentWindow.screenX + (window.outerWidth - width) / 2;
-      // const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
-      // const title = `WINDOW TITLE`;
-      // currentWindow.open(url, title, `width=${width},height=${height},left=${left},top=${top}`);
-      
+    wordSpan.addEventListener("mouseenter", event => {
+      const word = event.target;      
       synthesyseWordSound(word.textContent);
 
-      word._tippy.setContent(`<div style="max-height: 40vh; overflow-y: auto;">${translateWord(word.textContent)}</div>`);
+      word._tippy.setContent(
+        <div style={{maxHeight: "20vh", minWidth: 200, overflowY: "auto" }}>
+          { translateWord(word.textContent) } 
+        </div>
+      );
       word._tippy.show();
       
       event.target.style.color = "orange";
@@ -72,30 +68,85 @@ function synthesyseWordSound(word) {
   speechSynthesis.speak(utterance);
 }
 
-createSingleton(tippy('.word-tooltip'), {
-  theme: 'light-border',
+createSingleton(tippy(".word-tooltip"), {
+  theme: "light-border",
   allowHTML: true,
   interactive: true,
   // interactiveDebounce: 999999,
   appendTo: () => document.body
 });
 
+const openTranslationPopup = (url) => {
+  const currentWindow = window;
+  const width = 500;
+  const height = 400;
+  const left = currentWindow.screenX + (window.outerWidth - width) / 2;
+  const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
+  currentWindow.open(url, "", `width=${width},height=${height},left=${left},top=${top}`);
+};
+
 function translateWord(word) {
   const dictionaryEntry = dictionary[word];
   if (!dictionaryEntry) {
     if (word.length == 1) {
-      return`<b>${word}</b> <br>No availible translation`;
+      return (
+        <>
+          <b>{ word }</b> <br/>No availible translation
+        </>
+      );
     }
     if (word.length > 1) {
       const wordParts = word.split('');
-      const wordPartsTranslations = wordParts.map(wordPart => translateWord(wordPart)).join("<br>");
+      const wordPartsTranslations = wordParts.map(wordPart => (
+        <>
+          { translateWord(wordPart) }
+          <br/>
+        </>
+      ));
       return wordPartsTranslations;
     }
   } else {
     const translation = dictionaryEntry.length ? 
-      dictionaryEntry.map(el => el.translations.map(el => `<li style="list-style-type:circle;" >${el}</li>`).join("")).join("") 
-      : dictionaryEntry.translations.map(el => `<li style="list-style-type:circle;" >${el}</li>`).join("");
-    return `<b>${word} ${dictionaryEntry.length ? dictionaryEntry[0].pinyin : dictionaryEntry.pinyin}</b> <br><ul style="padding-left: 20px;list-style-type:circle;">${translation}</ul>`;
+    dictionaryEntry.map(el => el.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el}</li>)).flat()
+    : dictionaryEntry.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>);
+
+    const encodedWord = encodeURIComponent(word);
+
+    return (
+      <>
+        <b>
+          { word } { dictionaryEntry.length ? dictionaryEntry[0].pinyin : dictionaryEntry.pinyin }
+        </b> 
+        <div style={{ display: "inline-block", float: "right" }}>
+          <button 
+            onClick={() => openTranslationPopup(`https://translate.google.com/?sl=zh-CN&tl=en&text=${encodedWord}%0A&op=translate`)} 
+            style={{ border: "none", background: "none" }}
+            title="Open Google Translate popup"
+          >
+            <GoogleTranslateSvg/>
+          </button>
+          
+          <button 
+            onClick={() => openTranslationPopup(`https://fanyi.baidu.com/#zh/en/${encodedWord}`)} 
+            style={{ border: "none", background: "none" }}
+            title="Open Baidu Translate popup"
+          >
+            <BaiduTranslateSvg/>
+          </button>
+          <button 
+            onClick={() => openTranslationPopup(`https://glosbe.com/zh/en/${encodedWord}`)} 
+            style={{ border: "none", background: "none" }}
+            title="Open Glosbe Translate popup"
+          >
+            <GlosbeTranslateSvg/>
+          </button>
+        </div>
+        <br/>
+        <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
+          { translation }
+        </ul>
+      </>
+    );
   }
 }
 
