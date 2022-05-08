@@ -5,6 +5,7 @@ import 'tippy.js/themes/light-border.css';
 import { GoogleTranslateSvg } from './logos/google-translate';
 import { BaiduTranslateSvg } from './logos/baidu';
 import { GlosbeTranslateSvg } from './logos/glosbe';
+import { WordRecognitionLevelButton } from './components/WordRecognitionLevelButton';
 
 const dictionary = {};
 
@@ -131,10 +132,7 @@ function translateWord(word) {
 
     return (
       <>
-        <b>
-          { word } { dictionaryEntry.length ? dictionaryEntry[0].pinyin : dictionaryEntry.pinyin }
-        </b> 
-        <div style={{ display: "inline-block", float: "right" }}>
+        <div style={{ height: 30 }}>
           <button 
             onClick={() => openTranslationPopup(`https://translate.google.com/?sl=zh-CN&tl=en&text=${encodedWord}%0A&op=translate`)} 
             style={{ border: "none", background: "none" }}
@@ -157,8 +155,19 @@ function translateWord(word) {
           >
             <GlosbeTranslateSvg/>
           </button>
+          <div style={{ display: "inline-block", float: "right" }}>
+            { WordRecognitionLevelButton({ level: 1, isCurrentSavedLevel: false }) }
+            { WordRecognitionLevelButton({ level: 2, isCurrentSavedLevel: true }) }
+            { WordRecognitionLevelButton({ level: 3, isCurrentSavedLevel: false }) }
+            { WordRecognitionLevelButton({ level: 4, isCurrentSavedLevel: false }) }
+            { WordRecognitionLevelButton({ level: 5, isCurrentSavedLevel: false }) }
+          </div>
         </div>
-        <br/>
+        <div>
+          <b>
+            { word } { dictionaryEntry.length ? dictionaryEntry[0].pinyin : dictionaryEntry.pinyin }
+          </b> 
+        </div>
         <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
           { translationItems }
         </ul>
