@@ -1,4 +1,5 @@
 import React from 'dom-chef';
+import * as wordMetadataService from '../services/wordMetadataService';
 
 const levels = [
   "First time seeing",
@@ -8,7 +9,10 @@ const levels = [
   "Known word"
 ];
 
-const handleClick = (event) => {
+const handleClick = (event, word, level) => {
+  const wordMetadata = wordMetadataService.getWordMetadata(word);
+  wordMetadata.level = level;
+  wordMetadataService.setWordMetadata(wordMetadata);
   event.target.parentElement.childNodes.forEach(el => {
     el.style.backgroundColor = "#e7e7e7";
   });
@@ -16,11 +20,11 @@ const handleClick = (event) => {
 };
 
 
-export const WordRecognitionLevelButton = ({ level, isCurrentSavedLevel }) => {
+export const WordRecognitionLevelButton = ({ level, isCurrentSavedLevel, word }) => {
   return <button 
     style={{ border: "0.5px solid", backgroundColor: isCurrentSavedLevel ? "yellow" : "#e7e7e7" }} 
     title={ levels[level - 1] }
-    onClick={handleClick}
+    onClick={(event) => handleClick(event, word, level)}
   >
     { level }
   </button>;
