@@ -44,7 +44,7 @@ Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-star
 
 1. Run `npm run watch` to watch for file changes and build continuously
 1. Run `npm install --global web-ext` (only only for the first time)
-1. In another terminal, run `web-ext run -t chromium --arg="--window-size=1920,1080"`
+1. In another terminal, run `web-ext run -t chromium --arg="--window-size=1920,1080" --arg="--auto-open-devtools-for-tabs"`
 1. Check that the extension is loaded by opening the extension options ([in Firefox](media/extension_options_firefox.png) or [in Chrome](media/extension_options_chrome.png)).
 
 #### Manually

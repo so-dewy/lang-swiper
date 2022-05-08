@@ -111,9 +111,21 @@ function translateWord(word) {
       return wordPartsTranslations;
     }
   } else {
-    const translation = dictionaryEntry.length ? 
-      dictionaryEntry.flatMap(el => el.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>))
-    : dictionaryEntry.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>);
+    let translationItems;
+    if (dictionaryEntry.length) {
+      const translationItemsSet = new Set();
+      translationItems = dictionaryEntry.flatMap(el => 
+        el.translations
+          .filter(el => {
+            const isADuplicate = translationItemsSet.has(el);
+            if (!isADuplicate) translationItemsSet.add(el);
+            return !isADuplicate;
+          })
+          .map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>)
+      )
+    } else {
+      translationItems = dictionaryEntry.translations.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>)
+    }
 
     const encodedWord = encodeURIComponent(word);
 
@@ -148,7 +160,7 @@ function translateWord(word) {
         </div>
         <br/>
         <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
-          { translation }
+          { translationItems }
         </ul>
       </>
     );
