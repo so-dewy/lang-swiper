@@ -3,9 +3,10 @@ import tippy, {createSingleton} from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/themes/light-border.css';
 import * as wordMetadataService from './services/wordMetadataService';
-import { dictionary, loadDictionary } from './dictionary';
+import { loadDictionary } from './dictionary';
 import { getAllTextNodes } from './services/domService';
-import { translateWord } from './services/translationService';
+import { Translation } from './services/translationService';
+import { WORD_LEVELS } from './components/WordRecognitionLevelButton';
 
 // @ts-ignore
 const segmenter = new Intl.Segmenter(['zh'], {
@@ -27,7 +28,7 @@ const setWordRefEventListeners = (wordRef) => {
 
     target._tippy.setContent(
       <div style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
-        { translateWord(target.textContent) } 
+        { Translation(target) } 
       </div>
     );
     target._tippy.show();
@@ -40,7 +41,7 @@ const setWordRefEventListeners = (wordRef) => {
 }
 
 const init = async () => {
-  const wordRefs = [];
+  const wordRefs: HTMLElement[] = [];
 
   getAllTextNodes().forEach(node => {
     const mandarin = node.textContent.trim();
@@ -77,11 +78,18 @@ const init = async () => {
   wordRefs.forEach(wordRef => {
     let wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
     if (!wordMetadata) {
-      unsetWords[wordRef.textContent] = { word: wordRef.textContent, level: 1 };
+      unsetWords[wordRef.textContent] = { word: wordRef.textContent, level: 0 };
     }
   });
   
   await wordMetadataService.setWordMetadataBulk(unsetWords);
+
+  wordRefs.forEach(wordRef => {
+    const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
+    const wordLevel = WORD_LEVELS[wordMetadata.level];
+    wordRef.style.backgroundColor = wordLevel.backgroundColor;
+    wordRef.style.color = wordLevel.color;
+  });
 
   await loadDictionary();
 }

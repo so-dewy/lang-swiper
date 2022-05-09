@@ -1,6 +1,16 @@
 import browser from 'webextension-polyfill';
 
-export const dictionary = {};
+interface DictionaryEntry {
+  traditional: string,
+  pinyin: string,
+  translations: string[]
+}
+
+interface Dictionary {
+  [key: string]: DictionaryEntry[]
+}
+
+export const dictionary: Dictionary = {};
 
 export async function loadDictionary() {
   const startTime = Date.now();
@@ -17,12 +27,10 @@ export async function loadDictionary() {
       translations: englishTranslations.filter(el => el != "\r")
     };
     if (!dictionary[simplified]) {
-      dictionary[simplified] = newEntry;
+      dictionary[simplified] = [newEntry];
     } else {
       const entry = dictionary[simplified];
-      const entryList = entry.length ? entry : [entry];
-      entryList.push(newEntry);
-      dictionary[simplified] = entryList;
+      entry.push(newEntry);
     }
   }
   const loadTime = (Date.now() - startTime) / 1000; 

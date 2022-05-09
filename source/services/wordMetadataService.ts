@@ -11,9 +11,7 @@ export let wordsMetadata: WordsMetadata = {
 };
 
 export const setWordMetadata = (wordMetadata: WordMetadata) => {
-  browser.storage.local.set({[wordMetadata.word]: wordMetadata}).then(() => {
-    console.log(`${wordMetadata.word} is set to ${JSON.stringify(wordMetadata)}`);
-  });
+  browser.storage.local.set({[wordMetadata.word]: wordMetadata});
   wordsMetadata[wordMetadata.word] = wordMetadata;
 };
 
