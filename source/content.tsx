@@ -13,7 +13,7 @@ const segmenter = new Intl.Segmenter(['zh'], {
   granularity: 'word',
 });
 
-const punctuation = ["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"];
+const punctuation = new Set(["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"]);
 
 const synthesizeWordSound = (word) => {
   const utterance = new SpeechSynthesisUtterance(word);
@@ -55,7 +55,7 @@ const init = async () => {
       wordRef.after(span);
       span.appendChild(wordRef);
   
-      if (punctuation.indexOf(word) != -1 || !(/\p{Script=Han}/u.test(word))) continue;
+      if (punctuation.has(word) || !(/\p{Script=Han}/u.test(word))) continue;
   
       wordRefs.push(wordRef);
       wordRef.className = "word-tooltip";
