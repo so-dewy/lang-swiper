@@ -89,6 +89,7 @@ const init = async () => {
     const wordLevel = WORD_LEVELS[wordMetadata.level];
     wordRef.style.backgroundColor = wordLevel.backgroundColor;
     wordRef.style.color = wordLevel.color;
+    wordRef.style.marginRight = "5px";
   });
 
   await loadDictionary();
