@@ -15,12 +15,14 @@ export const setWordMetadata = (wordMetadata: WordMetadata) => {
   wordsMetadata[wordMetadata.word] = wordMetadata;
 };
 
-export const setWordMetadataBulk = (bulkMetadata: WordsMetadata) => {
+export const setWordMetadataBulk = (bulkMetadata: WordsMetadata, persist: boolean) => {
   const words = Object.keys(bulkMetadata);
   for (const word of words) {
     wordsMetadata[word] = bulkMetadata[word];
   }
-  browser.storage.local.set(bulkMetadata);
+  if (persist) {
+    browser.storage.local.set(bulkMetadata);
+  }
 };
 
 export const getWordMetadata = (word): WordMetadata => {

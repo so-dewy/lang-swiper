@@ -4,7 +4,7 @@ import { BaiduTranslateSvg } from '../logos/baidu';
 import { GlosbeTranslateSvg } from '../logos/glosbe';
 import { WordRecognitionLevelButton, WORD_LEVELS } from '../components/WordRecognitionLevelButton';
 import { dictionary } from '../dictionary';
-import { getWordMetadata, setWordMetadata } from '../services/wordMetadataService';
+import { getWordMetadata } from '../services/wordMetadataService';
 
 interface WordTranslation {
   word: string,

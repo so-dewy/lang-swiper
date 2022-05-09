@@ -88,7 +88,7 @@ const init = async () => {
     }
   });
   
-  await wordMetadataService.setWordMetadataBulk(unsetWords);
+  await wordMetadataService.setWordMetadataBulk(unsetWords, false);
 
   wordRefs.forEach(wordRef => {
     let elementRefs = wordToElementRefs[wordRef.textContent];
