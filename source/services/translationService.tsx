@@ -46,15 +46,13 @@ export const Translation = (wordElementRef: HTMLElement) => {
 
   return (
     <>
-      <div style={{ height: 30 }}>
-        { 
-          wordRecognitionButtons.length && (
-            <div style={{ display: "inline-block" }}>
-              { wordRecognitionButtons }
-            </div>
-          )
-        }
-      </div>
+      { 
+        wordRecognitionButtons.length && (
+          <div style={{ height: 30, display: "flex", alignItems: "flex-start", gap: 5 }}>
+            { wordRecognitionButtons }
+          </div>
+        )
+      }
       { WordTranslationList(wordTranslation) }
       <br/>
       { wordPartTranslations }
@@ -66,13 +64,12 @@ export const Translation = (wordElementRef: HTMLElement) => {
 const WordTranslationList = (wordTranslation: WordTranslation) => {
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-        <b>
-          { wordTranslation.word } { wordTranslation.pinyin ? wordTranslation.pinyin : "" }
-        </b> 
-        <div style={{ justifySelf: "right" }}>
-          { ThirdPartyTranslationButtons(wordTranslation.word) }
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 30 }}>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 5 }}>
+          <span style={{ fontSize: 25 }}>{ wordTranslation.word }</span> 
+          <b>{ wordTranslation.pinyin ? wordTranslation.pinyin : "" }</b> 
         </div>
+        { ThirdPartyTranslationButtons(wordTranslation.word) }
       </div>
       <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
         { wordTranslation.translation.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>) }
@@ -85,28 +82,30 @@ const ThirdPartyTranslationButtons = (word: string) => {
   const encodedWord = encodeURIComponent(word);
   return (
     <>
-      <button 
-        onClick={() => openTranslationPopup(`https://translate.google.com/?sl=zh-CN&tl=en&text=${encodedWord}%0A&op=translate`)} 
-        style={{ border: "none", background: "none" }}
-        title="Open Google Translate popup"
-      >
-        <GoogleTranslateSvg/>
-      </button>
-      
-      <button 
-        onClick={() => openTranslationPopup(`https://fanyi.baidu.com/#zh/en/${encodedWord}`)} 
-        style={{ border: "none", background: "none" }}
-        title="Open Baidu Translate popup"
-      >
-        <BaiduTranslateSvg/>
-      </button>
-      <button 
-        onClick={() => openTranslationPopup(`https://glosbe.com/zh/en/${encodedWord}`)} 
-        style={{ border: "none", background: "none" }}
-        title="Open Glosbe Translate popup"
-      >
-        <GlosbeTranslateSvg/>
-      </button>
+      <div style={{ justifySelf: "right" }}>
+        <button 
+          onClick={() => openTranslationPopup(`https://translate.google.com/?sl=zh-CN&tl=en&text=${encodedWord}%0A&op=translate`)} 
+          style={{ border: "none", background: "none" }}
+          title="Open Google Translate popup"
+        >
+          <GoogleTranslateSvg/>
+        </button>
+        
+        <button 
+          onClick={() => openTranslationPopup(`https://fanyi.baidu.com/#zh/en/${encodedWord}`)} 
+          style={{ border: "none", background: "none" }}
+          title="Open Baidu Translate popup"
+        >
+          <BaiduTranslateSvg/>
+        </button>
+        <button 
+          onClick={() => openTranslationPopup(`https://glosbe.com/zh/en/${encodedWord}`)} 
+          style={{ border: "none", background: "none" }}
+          title="Open Glosbe Translate popup"
+        >
+          <GlosbeTranslateSvg/>
+        </button>
+      </div>
     </>
   );
 }
