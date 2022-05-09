@@ -1,4 +1,5 @@
 import React from 'dom-chef';
+import { wordToElementRefs } from '../content';
 import * as wordMetadataService from '../services/wordMetadataService';
 
 interface WordLevelData {
@@ -22,6 +23,12 @@ const handleClick = (event, word: string, level: WordLevelData, wordElementRef: 
   const wordMetadata = wordMetadataService.getWordMetadata(word);
   wordMetadata.level = level.index;
   wordMetadataService.setWordMetadata(wordMetadata);
+
+  const sameWordElementRefs = wordToElementRefs[word];
+
+  sameWordElementRefs.forEach(el => {
+    el.style.backgroundColor = level.backgroundColor;
+  });
 
   event.target.parentElement.childNodes.forEach(el => {
     el.style.backgroundColor = DESELECTED_BUTTON_COLOR;

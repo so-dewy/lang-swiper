@@ -13,6 +13,12 @@ const segmenter = new Intl.Segmenter(['zh'], {
   granularity: 'word',
 });
 
+interface WordToElementRefs {
+  [key: string]: HTMLElement[]
+}
+
+export const wordToElementRefs: WordToElementRefs = {};
+
 const punctuation = new Set(["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"]);
 
 const synthesizeWordSound = (word) => {
@@ -85,6 +91,13 @@ const init = async () => {
   await wordMetadataService.setWordMetadataBulk(unsetWords);
 
   wordRefs.forEach(wordRef => {
+    let elementRefs = wordToElementRefs[wordRef.textContent];
+    if (!elementRefs) {
+      elementRefs = [];
+    }
+    elementRefs.push(wordRef);
+    wordToElementRefs[wordRef.textContent] = elementRefs;
+
     const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
     const wordLevel = WORD_LEVELS[wordMetadata.level];
     wordRef.style.backgroundColor = wordLevel.backgroundColor;
