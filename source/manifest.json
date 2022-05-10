@@ -32,7 +32,7 @@
 			"matches": [ "<all_urls>" ],
 			"js": [ "content.tsx" ],
 			"css": [ "content.css" ],
-			"run_at": "document_end"
+			"run_at": "document_idle"
 		}
 	],
 	"options_ui": {
@@ -56,6 +56,6 @@
 		{
 			"resources": ["dictionaries/cedict_1_0_ts_utf-8_mdbg.txt"],
 			"matches": ["<all_urls>"]
-	  	}
+		}
 	]	  
 }

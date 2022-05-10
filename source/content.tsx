@@ -7,6 +7,8 @@ import { loadDictionary } from './dictionary';
 import { getAllTextNodes } from './services/domService';
 import { Translation } from './services/translationService';
 import { WORD_LEVELS } from './components/WordRecognitionLevelButton';
+import browser from 'webextension-polyfill';
+import { WordMetadataDictionary } from './services/wordMetadataService';
 
 // @ts-ignore
 const segmenter = new Intl.Segmenter(['zh'], {
@@ -46,6 +48,29 @@ const setWordRefEventListeners = (wordRef) => {
   }, false);
 }
 
+const updateWordElementState = (word, level) => {
+  const levelData = WORD_LEVELS[level];
+  const sameWordElementRefs = wordToElementRefs[word];
+
+  if (sameWordElementRefs) {
+    sameWordElementRefs.forEach(el => {
+      el.style.backgroundColor = levelData.backgroundColor;
+    });
+  }
+};
+
+browser.runtime.onMessage.addListener((message) => {
+  if (message.type == "wordMetadata") {
+    const wordMetadata = message.wordMetadata as WordMetadataDictionary;
+    wordMetadataService.setWordMetadataBulk(wordMetadata, true);
+
+    const words = Object.keys(wordMetadata);
+    for (const word of words) {
+      updateWordElementState(word, wordMetadata[word].level);
+    }
+  }
+});
+
 const init = async () => {
   const wordRefs: HTMLElement[] = [];
 
@@ -84,7 +109,7 @@ const init = async () => {
   wordRefs.forEach(wordRef => {
     let wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
     if (!wordMetadata) {
-      unsetWords[wordRef.textContent] = { word: wordRef.textContent, level: 0 };
+      unsetWords[wordRef.textContent] = { level: 0 };
     }
   });
   

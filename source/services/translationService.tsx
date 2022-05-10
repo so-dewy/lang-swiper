@@ -27,7 +27,7 @@ export const Translation = (wordElementRef: HTMLElement) => {
   const wordTranslation = translateWord(word);
 
   let wordMetadata = getWordMetadata(word);
-  wordMetadata = wordMetadata ? wordMetadata : { word: word, level: 1 };
+  wordMetadata = wordMetadata ? wordMetadata : { level: 1 };
   
   const wordRecognitionButtons = [];
   for (let i = 1; i < WORD_LEVELS.length; i++) {

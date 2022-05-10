@@ -30,7 +30,9 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"@types/webextension-polyfill": "^0.8.3",
 		"dom-chef": "^5.1.0",
+		"papaparse": "^5.3.2",
 		"segmentit": "^2.0.3",
 		"tippy.js": "^6.3.7",
 		"webext-base-css": "^1.4.0",

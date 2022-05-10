@@ -1,21 +1,20 @@
 import browser from 'webextension-polyfill';
 
-interface WordMetadata {
-  word: string,
+export interface WordMetadata {
   level: number
 }
 
-interface WordsMetadata { [key: string]: WordMetadata }
+export interface WordMetadataDictionary { [key: string]: WordMetadata }
 
-export let wordsMetadata: WordsMetadata = {
+export let wordsMetadata: WordMetadataDictionary = {
 };
 
-export const setWordMetadata = (wordMetadata: WordMetadata) => {
-  browser.storage.local.set({[wordMetadata.word]: wordMetadata});
-  wordsMetadata[wordMetadata.word] = wordMetadata;
+export const setWordMetadata = (word: string, wordMetadata: WordMetadata) => {
+  browser.storage.local.set({[word]: wordMetadata});
+  wordsMetadata[word] = wordMetadata;
 };
 
-export const setWordMetadataBulk = (bulkMetadata: WordsMetadata, persist: boolean) => {
+export const setWordMetadataBulk = (bulkMetadata: WordMetadataDictionary, persist: boolean) => {
   const words = Object.keys(bulkMetadata);
   for (const word of words) {
     wordsMetadata[word] = bulkMetadata[word];
@@ -29,6 +28,6 @@ export const getWordMetadata = (word): WordMetadata => {
   return wordsMetadata[word];
 };
 
-export const loadMetadataFromStorage = async (words) => {
+export const loadMetadataFromStorage = async (words: string[]) => {
   wordsMetadata = await browser.storage.local.get(words);
 };

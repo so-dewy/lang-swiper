@@ -22,7 +22,7 @@ export const WORD_LEVELS: WordLevelData[] = [
 const handleClick = (event, word: string, level: WordLevelData, wordElementRef: HTMLElement) => {
   const wordMetadata = wordMetadataService.getWordMetadata(word);
   wordMetadata.level = level.index;
-  wordMetadataService.setWordMetadata(wordMetadata);
+  wordMetadataService.setWordMetadata(word, wordMetadata);
 
   const sameWordElementRefs = wordToElementRefs[word];
 
