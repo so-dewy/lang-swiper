@@ -27,10 +27,11 @@ const csvDownload = (data) => {
 const sendMessage = (message) => {
   browser.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
     const activeTab = tabs[0];
-    browser.tabs.sendMessage(activeTab.id, { wordMetadata: message, type: "wordMetadata" });
+    browser.tabs.sendMessage(activeTab.id, message);
   });
 };
 
+document.addEventListener('DOMContentLoaded', function () {
 const exportWordsButton = document.getElementById("exportWords");
 exportWordsButton.addEventListener("click", _event => {
   browser.storage.local.get(null).then(data => {
@@ -50,33 +51,8 @@ exportWordsButton.addEventListener("click", _event => {
   });
 });
 
-let rowCounter = 0;
-let wordMetadataBatch = {};
-
 const importWordsButton = document.getElementById("importWords");
 importWordsButton.addEventListener("click", _event => {
-  console.log("click");
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.onchange = e => { 
-    const file = (e.target as HTMLInputElement).files[0]; 
-    Papa.parse(input.files[0], {
-      worker: true,
-      header: true,
-      step: (row) => {
-        rowCounter++;
-        if (rowCounter == 500) {
-          sendMessage(wordMetadataBatch);
-          rowCounter = 0;
-          wordMetadataBatch = {};
-        } else {
-          wordMetadataBatch[row.data.word] = { level: row.data.level };
-        }
-      },
-      complete: () => {
-        console.log("All done!");
-      }
+    sendMessage({ type: "importWords" });
     });
-  }
-  input.click();
 });
