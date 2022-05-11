@@ -2,9 +2,8 @@ import OptionsSync from 'webext-options-sync';
 
 export default new OptionsSync({
 	defaults: {
-		colorRed: 244,
-		colorGreen: 67,
-		colorBlue: 54,
+		fontSize: 20,
+		useFontSize: false,
 		text: 'Set a text!',
 	},
 	migrations: [

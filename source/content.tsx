@@ -8,8 +8,8 @@ import { getAllTextNodes } from './services/domService';
 import { Translation } from './services/translationService';
 import { WORD_LEVELS } from './components/WordRecognitionLevelButton';
 import browser from 'webextension-polyfill';
-import { WordMetadataDictionary } from './services/wordMetadataService';
 import * as Papa from 'papaparse';
+import optionsStorage from './options-storage.js';
 
 // @ts-ignore
 const segmenter = new Intl.Segmenter(['zh'], {
@@ -77,9 +77,9 @@ browser.runtime.onMessage.addListener((message) => {
             wordMetadataService.setWordMetadataBulk(wordMetadataBatch, true);
 
             const words = Object.keys(wordMetadataBatch);
-    for (const word of words) {
+            for (const word of words) {
               updateWordElementState(word, wordMetadataBatch[word].level);
-    }
+            }
             rowCounter = 0;
             wordMetadataBatch = {};
           } else {
@@ -139,6 +139,8 @@ const init = async () => {
   
   await wordMetadataService.setWordMetadataBulk(unsetWords, false);
 
+  const options = await optionsStorage.getAll();
+
   wordRefs.forEach(wordRef => {
     let elementRefs = wordToElementRefs[wordRef.textContent];
     if (!elementRefs) {
@@ -152,6 +154,7 @@ const init = async () => {
     wordRef.style.backgroundColor = wordLevel.backgroundColor;
     wordRef.style.color = wordLevel.color;
     wordRef.style.marginRight = "5px";
+    wordRef.style.fontSize = `${options.fontSize}px`;
   });
 
   await loadDictionary();
