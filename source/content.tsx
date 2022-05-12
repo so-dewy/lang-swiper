@@ -41,11 +41,10 @@ const setWordRefEventListeners = (wordRef) => {
       </div>
     );
     target._tippy.show();
-    
-    target.style.color = "orange";
+    target.style.border = "1px solid black";
   }, false);
   wordRef.addEventListener("mouseleave", event => {
-    event.target.style.color = "";
+    event.target.style.border = `1px solid transparent`;
   }, false);
 }
 
@@ -153,6 +152,7 @@ const init = async () => {
     const wordLevel = WORD_LEVELS[wordMetadata.level];
     wordRef.style.backgroundColor = wordLevel.backgroundColor;
     wordRef.style.color = wordLevel.color;
+    wordRef.style.border = `1px solid transparent`;
     wordRef.style.marginRight = "5px";
     wordRef.style.fontSize = `${options.fontSize}px`;
   });
