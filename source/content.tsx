@@ -155,6 +155,7 @@ const init = async () => {
     wordRef.style.border = `1px solid transparent`;
     wordRef.style.marginRight = "5px";
     wordRef.style.fontSize = `${options.fontSize}px`;
+    wordRef.style.wordBreak = "keep-all";
   });
 
   await loadDictionary();
