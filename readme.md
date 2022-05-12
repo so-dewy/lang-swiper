@@ -52,7 +52,6 @@ Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-star
 You can also [load the extension manually in Chrome](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#google-chrome-opera-vivaldi) or [Firefox](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#mozilla-firefox).
 
 ## TODO
-- [ ] Font size config
 - [ ] Word colors config
 - [ ] TTS voices config (which voice, rate)
 - [ ] Profile laggy pages
