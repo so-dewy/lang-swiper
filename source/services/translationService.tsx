@@ -78,29 +78,38 @@ const WordTranslationList = (wordTranslation: WordTranslation) => {
   )
 }
 
+const onMouseEnterHandler = (event) => { (event.target as HTMLButtonElement).style.border = `1px solid #dddddd` }
+const onMouseLeaveHandler = (event) => { (event.target as HTMLButtonElement).style.border = `1px solid transparent` }
+
 const ThirdPartyTranslationButtons = (word: string) => { 
   const encodedWord = encodeURIComponent(word);
   return (
     <>
       <div style={{ justifySelf: "right" }}>
         <button 
+          onMouseEnter={onMouseEnterHandler}
+          onMouseLeave={onMouseLeaveHandler}
           onClick={() => openTranslationPopup(`https://translate.google.com/?sl=zh-CN&tl=en&text=${encodedWord}%0A&op=translate`)} 
-          style={{ border: "none", background: "none" }}
+          style={{ border: "1px solid transparent", background: "none" }}
           title="Open Google Translate popup"
         >
           <GoogleTranslateSvg/>
         </button>
         
         <button 
+          onMouseEnter={onMouseEnterHandler}
+          onMouseLeave={onMouseLeaveHandler}
           onClick={() => openTranslationPopup(`https://fanyi.baidu.com/#zh/en/${encodedWord}`)} 
-          style={{ border: "none", background: "none" }}
+          style={{ border: "1px solid transparent", background: "none" }}
           title="Open Baidu Translate popup"
         >
           <BaiduTranslateSvg/>
         </button>
         <button 
+          onMouseEnter={onMouseEnterHandler}
+          onMouseLeave={onMouseLeaveHandler}
           onClick={() => openTranslationPopup(`https://glosbe.com/zh/en/${encodedWord}`)} 
-          style={{ border: "none", background: "none" }}
+          style={{ border: "1px solid transparent", background: "none" }}
           title="Open Glosbe Translate popup"
         >
           <GlosbeTranslateSvg/>
