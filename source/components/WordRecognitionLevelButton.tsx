@@ -47,7 +47,9 @@ interface WordRecognitionLevelProps {
 export const WordRecognitionLevelButton = ({ level, isCurrentSavedLevel, word, wordElementRef }: WordRecognitionLevelProps) => {
   const levelData = WORD_LEVELS[level];
   return <button 
-    style={{ border: "0.5px solid", backgroundColor: isCurrentSavedLevel ? SELECTED_BUTTON_COLOR : DESELECTED_BUTTON_COLOR }} 
+    onMouseEnter={(event) => { (event.target as HTMLButtonElement).style.border = `1px solid black` }}
+    onMouseLeave={(event) => { (event.target as HTMLButtonElement).style.border = `1px solid ${DESELECTED_BUTTON_COLOR}` }}
+    style={{ border: `1px solid ${DESELECTED_BUTTON_COLOR}`, backgroundColor: isCurrentSavedLevel ? SELECTED_BUTTON_COLOR : DESELECTED_BUTTON_COLOR }} 
     title={ levelData.title }
     onClick={(event) => handleClick(event, word, levelData, wordElementRef)}
   >
