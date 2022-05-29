@@ -30,21 +30,63 @@ const synthesizeWordSound = (word) => {
   speechSynthesis.speak(utterance);
 };
 
+export const autoPlayState = {
+  isAutoPlayOn: false,
+  toggleAutoPlay() {
+    this.isAutoPlayOn = !this.isAutoPlayOn;
+  }
+};
+let intervalId;
+
+const activateNextWord = (currentWordRef, nextWordRef) => {
+  const onMouseEnterHandler = () => {
+    clearInterval(intervalId);
+  };
+  const onMouseLeaveHandler = () => {
+    setTimeout(() => startAutoPlay(nextWordRef), 1000);
+  };
+  if (nextWordRef) {
+    nextWordRef._tippy.setContent(
+      <div onMouseEnter={onMouseEnterHandler} onMouseLeave={onMouseLeaveHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+        { Translation(nextWordRef) } 
+      </div>
+    );
+    nextWordRef._tippy.show();
+  }
+  currentWordRef._tippy.hide();
+};
+
+const startAutoPlay = (wordRef) => {
+  activateNextWord(wordRef, wordRef.nextWordRef);   
+  wordRef = wordRef.nextWordRef;
+  intervalId = setInterval(() => {
+    if (!wordRef) {
+      clearInterval(intervalId);
+    } else {
+      activateNextWord(wordRef, wordRef.nextWordRef);   
+      wordRef = wordRef.nextWordRef;
+    }
+  }, 2000);
+};
+
 const setWordRefEventListeners = (wordRef) => {
-  wordRef.addEventListener("mouseenter", event => {
+  wordRef.addEventListener("click", event => {
+    clearInterval(intervalId);
     const target = event.target;      
     synthesizeWordSound(target.textContent);
 
+    const onMouseLeaveHandler = () => {
+      if (autoPlayState.isAutoPlayOn) {
+        clearInterval(intervalId);
+        setTimeout(() => startAutoPlay(wordRef), 1000);
+      }
+    };
     target._tippy.setContent(
-      <div style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+      <div onMouseLeave={onMouseLeaveHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
         { Translation(target) } 
       </div>
     );
     target._tippy.show();
-    target.style.border = "1px solid black";
-  }, false);
-  wordRef.addEventListener("mouseleave", event => {
-    event.target.style.border = `1px solid transparent`;
   }, false);
 }
 
@@ -119,11 +161,17 @@ const init = async () => {
     node.remove();
   });
 
-  createSingleton(tippy(".word-tooltip"), {
+  tippy(".word-tooltip", {
     theme: "light-border",
     allowHTML: true,
     interactive: true,
-    // interactiveDebounce: 999999,
+    trigger: 'manual',
+    onShow(instance) {
+      (instance.reference as any).style.border = "1px solid black";
+    },
+    onHide(instance) {
+      (instance.reference as any).style.border = "1px solid transparent";
+    },
     appendTo: () => document.body
   });
 
@@ -140,6 +188,7 @@ const init = async () => {
 
   const options = await optionsStorage.getAll();
 
+  let previousRef;
   wordRefs.forEach(wordRef => {
     let elementRefs = wordToElementRefs[wordRef.textContent];
     if (!elementRefs) {
@@ -156,6 +205,11 @@ const init = async () => {
     wordRef.style.marginRight = "5px";
     wordRef.style.fontSize = `${options.fontSize}px`;
     wordRef.style.wordBreak = "keep-all";
+
+    if (previousRef) {
+      previousRef.nextWordRef = wordRef;
+    }
+    previousRef = wordRef;
   });
 
   await loadDictionary();

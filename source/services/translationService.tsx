@@ -5,6 +5,7 @@ import { GlosbeTranslateSvg } from '../logos/glosbe';
 import { WordRecognitionLevelButton, WORD_LEVELS } from '../components/WordRecognitionLevelButton';
 import { dictionary } from '../dictionary';
 import { getWordMetadata } from '../services/wordMetadataService';
+import { AutoPlayButton } from '../components/AutoPlayButton';
 
 interface WordTranslation {
   word: string,
@@ -46,13 +47,16 @@ export const Translation = (wordElementRef: HTMLElement) => {
 
   return (
     <>
-      { 
-        wordRecognitionButtons.length && (
-          <div style={{ height: 30, display: "flex", alignItems: "flex-start", gap: 5 }}>
-            { wordRecognitionButtons }
-          </div>
-        )
-      }
+      <div style={{ height: 30, display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+        { 
+          wordRecognitionButtons.length && (
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 5 }}>
+              { wordRecognitionButtons }
+            </div>
+          )
+        }
+        { AutoPlayButton() }
+      </div>
       { WordTranslationList(wordTranslation) }
       <br/>
       { wordPartTranslations }
