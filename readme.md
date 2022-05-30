@@ -55,8 +55,14 @@ You can also [load the extension manually in Chrome](https://www.smashingmagazin
 - [ ] Word colors config
 - [ ] TTS voices config (which voice, rate)
 - [ ] Profile laggy pages
-- [ ] Add more padding around individual words
 - [ ] Word tracker mode on/off (maybe by a hotkey)
 - [ ] Hover translate mode on/off (maybe by a hotkey)
 - [ ] Convert CEDICT dictionary to JSON (for faster load time?) instead of parsing this txt file line by line. Research background page capabilites for this, maybe it can be cached there instead of loading it on every refresh of the page
 - [ ] Style popup more professionally
+- [ ] Investigate funky styling on this page https://reject.tokyo/uncaught-error-extension-context-invalidated/
+- [ ] Investigate why tts doesn't start until open dev tools
+- [ ] Fix baidu popup
+- [ ] Option to not tts words above configured level
+Known words are skipped faster
+- [ ] Fix empty translation items
+- [ ] Fix autoplay turn off bug
