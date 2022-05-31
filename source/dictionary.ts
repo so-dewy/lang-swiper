@@ -24,7 +24,7 @@ export async function loadDictionary() {
     const newEntry = {
       traditional: traditional,
       pinyin: pinyin.split(']')[0],
-      translations: englishTranslations.filter(el => el != "\r")
+      translations: englishTranslations.filter(el => el != "\r" && el != '')
     };
     if (!dictionary[simplified]) {
       dictionary[simplified] = [newEntry];
