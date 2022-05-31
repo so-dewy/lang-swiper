@@ -38,16 +38,20 @@ export const autoPlayState = {
 };
 let intervalId;
 
+const tooltipMouseLeaveHandler = (wordRef) => {
+  if (autoPlayState.isAutoPlayOn) {
+    setTimeout(() => startAutoPlay(wordRef), 1000);
+  }
+};
+
+const tooltipMouseEnterHandler = () => {
+  clearInterval(intervalId);
+};
+
 const activateNextWord = (currentWordRef, nextWordRef) => {
-  const onMouseEnterHandler = () => {
-    clearInterval(intervalId);
-  };
-  const onMouseLeaveHandler = () => {
-    setTimeout(() => startAutoPlay(nextWordRef), 1000);
-  };
   if (nextWordRef) {
     nextWordRef._tippy.setContent(
-      <div onMouseEnter={onMouseEnterHandler} onMouseLeave={onMouseLeaveHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+      <div onMouseEnter={tooltipMouseEnterHandler} onMouseLeave={() => tooltipMouseLeaveHandler(nextWordRef)} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
         { Translation(nextWordRef) } 
       </div>
     );
@@ -57,16 +61,19 @@ const activateNextWord = (currentWordRef, nextWordRef) => {
 };
 
 const startAutoPlay = (wordRef) => {
+  clearInterval(intervalId);
   activateNextWord(wordRef, wordRef.nextWordRef);   
+  synthesizeWordSound(wordRef.nextWordRef.textContent);
   wordRef = wordRef.nextWordRef;
   intervalId = setInterval(() => {
-    if (!wordRef) {
+    if (!wordRef || !autoPlayState.isAutoPlayOn) {
       clearInterval(intervalId);
     } else {
       activateNextWord(wordRef, wordRef.nextWordRef);   
+      synthesizeWordSound(wordRef.nextWordRef.textContent);
       wordRef = wordRef.nextWordRef;
     }
-  }, 2000);
+  }, 5000);
 };
 
 const setWordRefEventListeners = (wordRef) => {
@@ -75,14 +82,8 @@ const setWordRefEventListeners = (wordRef) => {
     const target = event.target;      
     synthesizeWordSound(target.textContent);
 
-    const onMouseLeaveHandler = () => {
-      if (autoPlayState.isAutoPlayOn) {
-        clearInterval(intervalId);
-        setTimeout(() => startAutoPlay(wordRef), 1000);
-      }
-    };
     target._tippy.setContent(
-      <div onMouseLeave={onMouseLeaveHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+      <div onMouseLeave={() => tooltipMouseLeaveHandler(wordRef)} onMouseEnter={tooltipMouseEnterHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
         { Translation(target) } 
       </div>
     );

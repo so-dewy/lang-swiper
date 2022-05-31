@@ -4,7 +4,7 @@ import { AutoPlaySvg } from '../logos/auto-play';
 
 const handleClick = (event) => {
   autoPlayState.toggleAutoPlay();
-  (event.currentTarget as HTMLButtonElement).style.border = "1px solid black";
+  (event.currentTarget as HTMLButtonElement).style.border = `1px solid ${autoPlayState.isAutoPlayOn ? "black": "transparent"}`;
 };
 
 export const AutoPlayButton = () => {
