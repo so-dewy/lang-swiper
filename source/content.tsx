@@ -27,6 +27,7 @@ const punctuation = new Set(["，", ".", "!", "?", "。", " ", "(", ")", "[", "]
 const synthesizeWordSound = (word) => {
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "zh-CN";
+  speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
 };
 
@@ -36,16 +37,29 @@ export const autoPlayState = {
     this.isAutoPlayOn = !this.isAutoPlayOn;
   }
 };
-let intervalId;
+let timeoutId;
 
 const tooltipMouseLeaveHandler = (wordRef) => {
   if (autoPlayState.isAutoPlayOn) {
-    setTimeout(() => startAutoPlay(wordRef), 1000);
+    const word = wordRef.textContent;
+    const wordMetadata = wordMetadataService.getWordMetadata(word);
+    if (wordMetadata.level === 0) {
+      wordMetadata.level = 1;
+      wordMetadataService.setWordMetadata(word, wordMetadata);
+      
+      const wordLevel = WORD_LEVELS[wordMetadata.level];
+      const sameWordElementRefs = wordToElementRefs[word];
+      sameWordElementRefs.forEach(el => {
+        el.style.backgroundColor = wordLevel.backgroundColor;
+      });
+
+    }
+    timeoutId = setTimeout(() => startAutoPlay(wordRef), 1000);
   }
 };
 
 const tooltipMouseEnterHandler = () => {
-  clearInterval(intervalId);
+  clearTimeout(timeoutId);
 };
 
 const activateNextWord = (currentWordRef, nextWordRef) => {
@@ -61,24 +75,24 @@ const activateNextWord = (currentWordRef, nextWordRef) => {
 };
 
 const startAutoPlay = (wordRef) => {
-  clearInterval(intervalId);
-  activateNextWord(wordRef, wordRef.nextWordRef);   
-  synthesizeWordSound(wordRef.nextWordRef.textContent);
-  wordRef = wordRef.nextWordRef;
-  intervalId = setInterval(() => {
-    if (!wordRef || !autoPlayState.isAutoPlayOn) {
-      clearInterval(intervalId);
-    } else {
-      activateNextWord(wordRef, wordRef.nextWordRef);   
-      synthesizeWordSound(wordRef.nextWordRef.textContent);
-      wordRef = wordRef.nextWordRef;
+  if (!wordRef || !autoPlayState.isAutoPlayOn) {
+    clearTimeout(timeoutId);
+  } else {
+    activateNextWord(wordRef, wordRef.nextWordRef);   
+    synthesizeWordSound(wordRef.nextWordRef.textContent);
+    wordRef = wordRef.nextWordRef;
+    
+    const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
+    const levelData = WORD_LEVELS[wordMetadata.level];
+    if (wordMetadata.level !== 0) {
+      timeoutId = setTimeout(() => startAutoPlay(wordRef), levelData.autoPlayTimeout);
     }
-  }, 5000);
+  }
 };
 
 const setWordRefEventListeners = (wordRef) => {
   wordRef.addEventListener("click", event => {
-    clearInterval(intervalId);
+    clearTimeout(timeoutId);
     const target = event.target;      
     synthesizeWordSound(target.textContent);
 
@@ -125,7 +139,7 @@ browser.runtime.onMessage.addListener((message) => {
             rowCounter = 0;
             wordMetadataBatch = {};
           } else {
-            wordMetadataBatch[row.data.word] = { level: row.data.level };
+            wordMetadataBatch[row.data.word] = { level: Number(row.data.level) };
           }
         },
         complete: () => {

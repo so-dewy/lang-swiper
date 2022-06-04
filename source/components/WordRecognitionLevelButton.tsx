@@ -6,17 +6,18 @@ interface WordLevelData {
   title: string,
   color: string,
   backgroundColor: string,
-  index: number
+  index: number,
+  autoPlayTimeout: number
 }
 const DESELECTED_BUTTON_COLOR = "#e7e7e7";
 const SELECTED_BUTTON_COLOR = "yellow";
 
 export const WORD_LEVELS: WordLevelData[] = [
-  { title: "", backgroundColor: "rgb(242 192 255)", color: "black", index: 0 },
-  { title: "Seen before", backgroundColor: "rgb(23 255 73 / 100%)", color: "black", index: 1 },
-  { title: "Can remember meaning and pronunciation sometimes", backgroundColor: "rgb(23 255 73 / 60%)", color: "black", index: 2},
-  { title: "Almost always can remember meaning and pronunciation", backgroundColor: "rgb(23 255 73 / 30%)", color: "black", index: 3},
-  { title: "Known word", backgroundColor: "rgb(23 255 73 / 0%)", color: "black", index: 4},
+  { title: "", backgroundColor: "rgb(242 192 255)", color: "black", index: 0, autoPlayTimeout: 9999999 },
+  { title: "Seen before", backgroundColor: "rgb(23 255 73 / 100%)", color: "black", index: 1, autoPlayTimeout: 8000 },
+  { title: "Can remember meaning and pronunciation sometimes", backgroundColor: "rgb(23 255 73 / 60%)", color: "black", index: 2, autoPlayTimeout: 8000 },
+  { title: "Almost always can remember meaning and pronunciation", backgroundColor: "rgb(23 255 73 / 30%)", color: "black", index: 3, autoPlayTimeout: 4000 },
+  { title: "Known word", backgroundColor: "rgb(23 255 73 / 0%)", color: "black", index: 4, autoPlayTimeout: 2000 },
 ];
 
 const handleClick = (event, word: string, level: WordLevelData, wordElementRef: HTMLElement) => {
