@@ -24,9 +24,14 @@ export const wordToElementRefs: WordToElementRefs = {};
 
 const punctuation = new Set(["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"]);
 
-const synthesizeWordSound = (word) => {
+enum TtsLanguages {
+  Mandarin = "zh-CN",
+  English = "en-US"
+}
+
+const synthesizeWordSound = (word, language: TtsLanguages) => {
   const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = "zh-CN";
+  utterance.lang = language;
   speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
 };
@@ -79,7 +84,7 @@ const startAutoPlay = (wordRef) => {
     clearTimeout(timeoutId);
   } else {
     activateNextWord(wordRef, wordRef.nextWordRef);   
-    synthesizeWordSound(wordRef.nextWordRef.textContent);
+    synthesizeWordSound(wordRef.nextWordRef.textContent, TtsLanguages.Mandarin);
     wordRef = wordRef.nextWordRef;
     
     const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
@@ -94,7 +99,7 @@ const setWordRefEventListeners = (wordRef) => {
   wordRef.addEventListener("click", event => {
     clearTimeout(timeoutId);
     const target = event.target;      
-    synthesizeWordSound(target.textContent);
+    synthesizeWordSound(target.textContent, TtsLanguages.Mandarin);
 
     target._tippy.setContent(
       <div onMouseLeave={() => tooltipMouseLeaveHandler(wordRef)} onMouseEnter={tooltipMouseEnterHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
@@ -123,7 +128,8 @@ browser.runtime.onMessage.addListener((message) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = e => { 
-      const file = (e.target as HTMLInputElement).files[0]; 
+      if (!input || !input.files) return;
+
       Papa.parse(input.files[0], {
         worker: true,
         header: true,
@@ -155,6 +161,8 @@ const init = async () => {
   const wordRefs: HTMLElement[] = [];
 
   getAllTextNodes().forEach(node => {
+    if (!node.textContent) return;
+
     const mandarin = node.textContent.trim();
     const span = document.createElement('span');
     const words: any = Array.from(segmenter.segment(mandarin));
@@ -172,8 +180,8 @@ const init = async () => {
       wordRef.className = "word-tooltip";
       setWordRefEventListeners(wordRef);
     }
-    node.after(span);
-    node.remove();
+    (node as ChildNode).after(span);
+    (node as ChildNode).remove();
   });
 
   tippy(".word-tooltip", {
@@ -190,11 +198,11 @@ const init = async () => {
     appendTo: () => document.body
   });
 
-  await wordMetadataService.loadMetadataFromStorage(wordRefs.map(wordRef => wordRef.textContent));
+  await wordMetadataService.loadMetadataFromStorage(wordRefs.map(wordRef => wordRef.textContent ? wordRef.textContent : ""));
   const unsetWords = {};
   wordRefs.forEach(wordRef => {
     let wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
-    if (!wordMetadata) {
+    if (!wordMetadata && wordRef.textContent) {
       unsetWords[wordRef.textContent] = { level: 0 };
     }
   });
@@ -205,6 +213,8 @@ const init = async () => {
 
   let previousRef;
   wordRefs.forEach(wordRef => {
+    if (!wordRef.textContent) return;
+    
     let elementRefs = wordToElementRefs[wordRef.textContent];
     if (!elementRefs) {
       elementRefs = [];

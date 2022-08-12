@@ -25,12 +25,13 @@ const openTranslationPopup = (url) => {
 
 export const Translation = (wordElementRef: HTMLElement) => {  
   const word = wordElementRef.textContent;
+  if (!word) return;
   const wordTranslation = translateWord(word);
 
   let wordMetadata = getWordMetadata(word);
   wordMetadata = wordMetadata ? wordMetadata : { level: 1 };
   
-  const wordRecognitionButtons = [];
+  const wordRecognitionButtons: JSX.Element[] = [];
   for (let i = 1; i < WORD_LEVELS.length; i++) {
     wordRecognitionButtons.push(WordRecognitionLevelButton({ level: i , isCurrentSavedLevel: i == wordMetadata.level, word: word, wordElementRef: wordElementRef }))
   }
@@ -126,9 +127,6 @@ const ThirdPartyTranslationButtons = (word: string) => {
 const translateWord = (word: string): WordTranslation => {  
   const dictionaryEntry = dictionary[word];
   if (!dictionaryEntry) {
-    if (word.length == 1) {
-      return { word: word, translation: ["No availible translation"] };
-    }
     if (word.length > 1) {
       const wordSet = new Set();
       const wordParts = word.split('').filter(x => {
@@ -143,6 +141,7 @@ const translateWord = (word: string): WordTranslation => {
         wordPartTranslations
       };
     }
+    return { word: word, translation: ["No availible translation"] };
   } else {
     const translationItemsSet = new Set();
     const translationItems = dictionaryEntry.flatMap(el => 

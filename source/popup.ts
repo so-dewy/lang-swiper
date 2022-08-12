@@ -18,10 +18,10 @@ browser.storage.local.get(null).then(data => {
       counter[level - 1]++;
     }
   }
-  level1Count.textContent = counter[0].toString();
-  level2Count.textContent = counter[1].toString();
-  level3Count.textContent = counter[2].toString();
-  level4Count.textContent = counter[3].toString();
+  if (level1Count) level1Count.textContent = counter[0].toString();
+  if (level2Count) level2Count.textContent = counter[1].toString();
+  if (level3Count) level3Count.textContent = counter[2].toString();
+  if (level4Count) level4Count.textContent = counter[3].toString();
 });
 
 
@@ -51,16 +51,20 @@ const csvDownload = (data) => {
 const sendMessage = (message) => {
   browser.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
     const activeTab = tabs[0];
-    browser.tabs.sendMessage(activeTab.id, message);
+    if (activeTab.id) {
+      browser.tabs.sendMessage(activeTab.id, message);
+    }
   });
 };
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   const exportWordsButton = document.getElementById("exportWords");
+  if (!exportWordsButton) return;
+
   exportWordsButton.addEventListener("click", _event => {
     browser.storage.local.get(null).then(data => {
       const words = Object.keys(data);
-      const rows = [];
+      const rows: any[] = [];
       for (const word of words) {
         const wordData = data[word];
         if (wordData) {
@@ -76,6 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   const importWordsButton = document.getElementById("importWords");
+  if (!importWordsButton) return;
+
   importWordsButton.addEventListener("click", _event => {
     sendMessage({ type: "importWords" });
   });

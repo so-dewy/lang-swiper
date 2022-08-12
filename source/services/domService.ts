@@ -1,10 +1,10 @@
 export const getAllTextNodes = () => {
-  let textNode;
-  const textNodes = [];
+  let textNode: Node | null;
+  const textNodes: Node[] = [];
   const walk = document.createTreeWalker(document, NodeFilter.SHOW_TEXT);
   while (textNode = walk.nextNode()) {
     // Filter out empty space nodes and nodes without mandarin
-    if (/^\s+$/.test(textNode.textContent) || !(/\p{Script=Han}/u.test(textNode.textContent))) continue;
+    if (!textNode.textContent || /^\s+$/.test(textNode.textContent) || !(/\p{Script=Han}/u.test(textNode.textContent))) continue;
 
     textNodes.push(textNode);
   }
