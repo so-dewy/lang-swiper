@@ -10,6 +10,7 @@ import { WORD_LEVELS } from './components/WordRecognitionLevelButton';
 import browser from 'webextension-polyfill';
 import * as Papa from 'papaparse';
 import optionsStorage from './options-storage.js';
+import { WordMetadata } from './services/wordMetadataService';
 
 // @ts-ignore
 const segmenter = new Intl.Segmenter(['zh'], {
@@ -24,15 +25,17 @@ export const wordToElementRefs: WordToElementRefs = {};
 
 const punctuation = new Set(["，", ".", "!", "?", "。", " ", "(", ")", "[", "]", "*", "@", "#", "$", "%", "^", "&", "_", "+", "=", "-", "\\", "/", ":", ";"]);
 
-enum TtsLanguages {
+export enum TtsLanguages {
   Mandarin = "zh-CN",
   English = "en-US"
 }
 
-const synthesizeWordSound = (word, language: TtsLanguages) => {
+export const synthesizeWordSound = (word, language: TtsLanguages, shouldCancelPrevious: boolean = true) => {
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = language;
-  speechSynthesis.cancel();
+  if (shouldCancelPrevious) {
+    speechSynthesis.cancel();
+  }
   speechSynthesis.speak(utterance);
 };
 
@@ -83,8 +86,8 @@ const startAutoPlay = (wordRef) => {
   if (!wordRef || !autoPlayState.isAutoPlayOn) {
     clearTimeout(timeoutId);
   } else {
-    activateNextWord(wordRef, wordRef.nextWordRef);   
     synthesizeWordSound(wordRef.nextWordRef.textContent, TtsLanguages.Mandarin);
+    activateNextWord(wordRef, wordRef.nextWordRef);   
     wordRef = wordRef.nextWordRef;
     
     const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
@@ -124,7 +127,7 @@ const updateWordElementState = (word, level) => {
 browser.runtime.onMessage.addListener((message) => {
   if (message.type == "importWords") {
     let rowCounter = 0;
-    let wordMetadataBatch = {};
+    let wordMetadataBatch: { [key: string]: WordMetadata } = {};
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = e => { 
@@ -145,11 +148,15 @@ browser.runtime.onMessage.addListener((message) => {
             rowCounter = 0;
             wordMetadataBatch = {};
           } else {
-            wordMetadataBatch[row.data.word] = { level: Number(row.data.level) };
+            const metadata: WordMetadata = { level: Number(row.data.level) };
+            if (row.data.preferredTranslation) {
+              metadata.preferredTranslation = row.data.preferredTranslation;
+            }
+            wordMetadataBatch[row.data.word] = metadata;
           }
         },
         complete: () => {
-          console.log("All done!");
+          console.log("Import of words is done!");
         }
       });
     }

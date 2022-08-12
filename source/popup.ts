@@ -70,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wordData) {
           rows.push({
             word,
-            level: wordData.level
+            level: wordData.level,
+            preferredTranslation: wordData.preferredTranslation
           })
         }
       }

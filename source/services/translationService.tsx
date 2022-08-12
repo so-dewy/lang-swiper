@@ -4,8 +4,9 @@ import { BaiduTranslateSvg } from '../logos/baidu';
 import { GlosbeTranslateSvg } from '../logos/glosbe';
 import { WordRecognitionLevelButton, WORD_LEVELS } from '../components/WordRecognitionLevelButton';
 import { dictionary } from '../dictionary';
-import { getWordMetadata } from '../services/wordMetadataService';
+import { getWordMetadata, setWordMetadata, WordMetadata } from '../services/wordMetadataService';
 import { AutoPlayButton } from '../components/AutoPlayButton';
+import { synthesizeWordSound, TtsLanguages } from '../content';
 
 interface WordTranslation {
   word: string,
@@ -30,6 +31,20 @@ export const Translation = (wordElementRef: HTMLElement) => {
 
   let wordMetadata = getWordMetadata(word);
   wordMetadata = wordMetadata ? wordMetadata : { level: 1 };
+
+  let voiceInput: string;
+  if (wordMetadata.preferredTranslation) {
+    voiceInput = wordMetadata.preferredTranslation;
+  } else if (wordTranslation.wordPartTranslations) {
+    voiceInput = wordTranslation.wordPartTranslations.map(el => el.translation[0]).join(" ");
+  } else {
+    voiceInput = wordTranslation.translation[0];
+  }
+
+  const isNotKnownWord = wordMetadata.level != WORD_LEVELS.length - 1;
+  if (isNotKnownWord) {
+    synthesizeWordSound(voiceInput, TtsLanguages.English, false);
+  }
   
   const wordRecognitionButtons: JSX.Element[] = [];
   for (let i = 1; i < WORD_LEVELS.length; i++) {
@@ -46,6 +61,7 @@ export const Translation = (wordElementRef: HTMLElement) => {
     ));
   }
 
+  const preferredTranslation = wordMetadata.preferredTranslation ? wordMetadata.preferredTranslation : "";
   return (
     <>
       <div style={{ height: 30, display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -58,6 +74,11 @@ export const Translation = (wordElementRef: HTMLElement) => {
         }
         { AutoPlayButton() }
       </div>
+      <label htmlFor="preferredTranslation">Custom translation: </label>
+      <br/>
+      <input type="text" id="preferredTranslation" value={preferredTranslation} style={{ marginRight: 5}}>
+      </input>
+      <button onClick={(event) => savePreferredTranslation(event, word, wordMetadata) } >Save</button>
       { WordTranslationList(wordTranslation) }
       <br/>
       { wordPartTranslations }
@@ -154,4 +175,16 @@ const translateWord = (word: string): WordTranslation => {
 
     return { word: word, pinyin: dictionaryEntry[0].pinyin, translation: translationItems };
   }
+}
+
+const savePreferredTranslation = (event, word: string, wordMetadata: WordMetadata) => {
+  const preferredTranslationInput = document.getElementById("preferredTranslation");
+  if (!preferredTranslationInput) return;
+  const preferredTranslation = (preferredTranslationInput as HTMLButtonElement).value;
+  if (!preferredTranslation) return;
+
+  wordMetadata.preferredTranslation = preferredTranslation;
+
+  console.log(wordMetadata);
+  setWordMetadata(word, wordMetadata);  
 }

@@ -1,7 +1,8 @@
 import browser from 'webextension-polyfill';
 
 export interface WordMetadata {
-  level: number
+  level: number,
+  preferredTranslation?: string
 }
 
 export interface WordMetadataDictionary { [key: string]: WordMetadata }
