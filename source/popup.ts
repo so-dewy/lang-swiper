@@ -26,7 +26,8 @@ browser.storage.local.get(null).then(data => {
 
 
 const csvDownload = (data) => {
-  const filename = "export.csv";
+  const date = new Date();
+  const filename = `words-metadata-${date.getFullYear()}-${date.getMonth()}-${date.getDate()}.csv`;
   const csv = Papa.unparse(data);
 
   const blob = new Blob([csv], {
