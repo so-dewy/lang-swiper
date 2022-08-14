@@ -74,11 +74,12 @@ export const Translation = (wordElementRef: HTMLElement) => {
         }
         { AutoPlayButton() }
       </div>
-      <label htmlFor="preferredTranslation">Custom translation: </label>
-      <br/>
-      <input type="text" id="preferredTranslation" value={preferredTranslation} style={{ marginRight: 5}}>
-      </input>
-      <button onClick={(event) => savePreferredTranslation(event, word, wordMetadata) } >Save</button>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="preferredTranslation">Custom translation: </label>
+        <br/>
+        <input type="text" id="preferredTranslation" value={preferredTranslation} style={{ marginRight: 5 }}></input>
+        <button onClick={(event) => savePreferredTranslation(event, word, wordMetadata) } >Save</button>
+      </div>
       { WordTranslationList(wordTranslation) }
       <br/>
       { wordPartTranslations }
@@ -185,6 +186,5 @@ const savePreferredTranslation = (event, word: string, wordMetadata: WordMetadat
 
   wordMetadata.preferredTranslation = preferredTranslation;
 
-  console.log(wordMetadata);
   setWordMetadata(word, wordMetadata);  
 }

@@ -1,7 +1,4 @@
 import React from 'dom-chef';
-import tippy, {createSingleton} from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
-import 'tippy.js/themes/light-border.css';
 import * as wordMetadataService from './services/wordMetadataService';
 import { loadDictionary } from './dictionary';
 import { getAllTextNodes } from './services/domService';
@@ -39,6 +36,47 @@ export const synthesizeWordSound = (word, language: TtsLanguages, shouldCancelPr
   speechSynthesis.speak(utterance);
 };
 
+let startX = 0;
+let startY = 0;
+const dragStartHandler = (event) => {
+  startX = event.clientX - parseInt(window.getComputedStyle(draggableRect).left);
+  startY = event.clientY - parseInt(window.getComputedStyle(draggableRect).top);
+}
+
+const dragOverHandler = (event) => {
+  event.preventDefault();
+  return false;
+}
+
+const dropHandler = (event) => {
+  draggableRect.style.position = 'absolute';
+  draggableRect.style.left = event.clientX - startX + 'px';
+  draggableRect.style.top = event.clientY - startY + 'px';
+}
+
+const draggableRect = <div 
+  style={{ 
+    position: "absolute", 
+    left: window!.top!.outerWidth / 2 + window!.top!.screenX - ( 300 / 2), 
+    top: window!.top!.outerHeight / 2 + window!.top!.screenY - ( 300 / 2),
+    minWidth: 300,
+    maxWidth: 300,     
+    overflowY: "auto",
+    backgroundColor: "rgb(255, 255, 255)",
+    boxShadow: "rgba(0, 8, 16, 0.08) 0px 4px 14px -2px",
+    border: "1px rgba(0, 8, 16, 0.15) solid",
+    padding: 5
+  }}
+  onDragStart={dragStartHandler} 
+  draggable="true"
+>
+</div>;
+
+document.addEventListener('dragover', dragOverHandler);
+document.addEventListener('drop', dropHandler);
+
+let currentlyFocusedWord: HTMLElement;
+
 export const autoPlayState = {
   isAutoPlayOn: false,
   toggleAutoPlay() {
@@ -70,16 +108,19 @@ const tooltipMouseEnterHandler = () => {
   clearTimeout(timeoutId);
 };
 
-const activateNextWord = (currentWordRef, nextWordRef) => {
+const activateNextWord = (nextWordRef) => {
   if (nextWordRef) {
-    nextWordRef._tippy.setContent(
-      <div onMouseEnter={tooltipMouseEnterHandler} onMouseLeave={() => tooltipMouseLeaveHandler(nextWordRef)} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+    nextWordRef.style.border = "1px solid black";
+    draggableRect.replaceChildren(
+      <div onMouseEnter={tooltipMouseEnterHandler} onMouseLeave={() => tooltipMouseLeaveHandler(nextWordRef)} style={{minHeight: "40vh", maxHeight: "40vh", minWidth: 200}}>
         { Translation(nextWordRef) } 
       </div>
     );
-    nextWordRef._tippy.show();
   }
-  currentWordRef._tippy.hide();
+  if (currentlyFocusedWord) {
+    currentlyFocusedWord.style.border = "1px solid transparent";
+  }
+  currentlyFocusedWord = nextWordRef;
 };
 
 const startAutoPlay = (wordRef) => {
@@ -87,7 +128,7 @@ const startAutoPlay = (wordRef) => {
     clearTimeout(timeoutId);
   } else {
     synthesizeWordSound(wordRef.nextWordRef.textContent, TtsLanguages.Mandarin);
-    activateNextWord(wordRef, wordRef.nextWordRef);   
+    activateNextWord(wordRef.nextWordRef);   
     wordRef = wordRef.nextWordRef;
     
     const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
@@ -104,12 +145,18 @@ const setWordRefEventListeners = (wordRef) => {
     const target = event.target;      
     synthesizeWordSound(target.textContent, TtsLanguages.Mandarin);
 
-    target._tippy.setContent(
-      <div onMouseLeave={() => tooltipMouseLeaveHandler(wordRef)} onMouseEnter={tooltipMouseEnterHandler} style={{maxHeight: "40vh", minWidth: 200, overflowY: "auto" }}>
+    if (currentlyFocusedWord) {
+      currentlyFocusedWord.style.border = "1px solid transparent";
+    } else {
+      document.body.appendChild(draggableRect);
+    }
+    currentlyFocusedWord = wordRef;
+    wordRef.style.border = "1px solid black";
+    draggableRect.replaceChildren(
+      <div onMouseLeave={() => tooltipMouseLeaveHandler(wordRef)} onMouseEnter={tooltipMouseEnterHandler} style={{minHeight: "40vh", maxHeight: "40vh", minWidth: 200}}>
         { Translation(target) } 
       </div>
     );
-    target._tippy.show();
   }, false);
 }
 
@@ -189,20 +236,6 @@ const init = async () => {
     }
     (node as ChildNode).after(span);
     (node as ChildNode).remove();
-  });
-
-  tippy(".word-tooltip", {
-    theme: "light-border",
-    allowHTML: true,
-    interactive: true,
-    trigger: 'manual',
-    onShow(instance) {
-      (instance.reference as any).style.border = "1px solid black";
-    },
-    onHide(instance) {
-      (instance.reference as any).style.border = "1px solid transparent";
-    },
-    appendTo: () => document.body
   });
 
   await wordMetadataService.loadMetadataFromStorage(wordRefs.map(wordRef => wordRef.textContent ? wordRef.textContent : ""));
