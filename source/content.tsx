@@ -49,14 +49,13 @@ const dragOverHandler = (event) => {
 }
 
 const dropHandler = (event) => {
-  draggableRect.style.position = 'absolute';
   draggableRect.style.left = event.clientX - startX + 'px';
   draggableRect.style.top = event.clientY - startY + 'px';
 }
 
 const draggableRect = <div 
   style={{ 
-    position: "absolute", 
+    position: "fixed", 
     left: window!.top!.outerWidth / 2 + window!.top!.screenX - ( 300 / 2), 
     top: window!.top!.outerHeight / 2 + window!.top!.screenY - ( 300 / 2),
     minWidth: 300,
