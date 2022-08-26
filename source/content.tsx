@@ -217,13 +217,12 @@ const init = async () => {
     if (!node.textContent) return;
 
     const mandarin = node.textContent.trim();
-    const span = document.createElement('span');
+    const span = <span style={{ display: "inline-block", textAlign: "start" }}></span>;
     const words: any = Array.from(segmenter.segment(mandarin));
   
     for (let word of words) {
       word = word.segment;
-      const wordRef = document.createElement('span');
-      wordRef.textContent = word;
+      const wordRef = <span>{word}</span>;
       wordRef.after(span);
       span.appendChild(wordRef);
   
