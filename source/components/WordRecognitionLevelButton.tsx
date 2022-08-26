@@ -1,6 +1,7 @@
 import React from 'dom-chef';
 import { wordToElementRefs } from '../content';
 import * as wordMetadataService from '../services/wordMetadataService';
+import optionsStorage from '../options-storage.js';
 
 interface WordLevelData {
   title: string,
@@ -19,6 +20,16 @@ export const WORD_LEVELS: WordLevelData[] = [
   { title: "Almost always can remember meaning and pronunciation", backgroundColor: "rgb(23 255 73 / 30%)", color: "black", index: 3, autoPlayTimeout: 4000 },
   { title: "Known word", backgroundColor: "rgb(23 255 73 / 0%)", color: "black", index: 4, autoPlayTimeout: 2000 },
 ];
+
+const init = async () => {
+  const options = await optionsStorage.getAll();
+  WORD_LEVELS[1].autoPlayTimeout = Number(options.level1AutoPlayTimeout);
+  WORD_LEVELS[2].autoPlayTimeout = Number(options.level2AutoPlayTimeout);
+  WORD_LEVELS[3].autoPlayTimeout = Number(options.level3AutoPlayTimeout);
+  WORD_LEVELS[4].autoPlayTimeout = Number(options.level4AutoPlayTimeout);
+};
+
+init();
 
 const handleClick = (event, word: string, level: WordLevelData, wordElementRef: HTMLElement) => {
   const wordMetadata = wordMetadataService.getWordMetadata(word);

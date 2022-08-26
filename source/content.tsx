@@ -106,7 +106,7 @@ const tooltipMouseLeaveHandler = (wordRef) => {
       });
 
     }
-    timeoutId = setTimeout(() => startAutoPlay(wordRef), 1000);
+    timeoutId = setTimeout(() => startAutoPlay(wordRef), 500);
   }
 };
 
@@ -133,6 +133,8 @@ const startAutoPlay = (wordRef) => {
   if (!wordRef || !autoPlayState.isAutoPlayOn) {
     clearTimeout(timeoutId);
   } else {
+    const isMultiCharacterWord = wordRef.textContent.length > 1;
+
     synthesizeWordSound(wordRef.nextWordRef.textContent, TtsLanguages.Mandarin);
     activateNextWord(wordRef.nextWordRef);   
     wordRef = wordRef.nextWordRef;
@@ -140,7 +142,8 @@ const startAutoPlay = (wordRef) => {
     const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
     const levelData = WORD_LEVELS[wordMetadata.level];
     if (wordMetadata.level !== 0) {
-      timeoutId = setTimeout(() => startAutoPlay(wordRef), levelData.autoPlayTimeout);
+      const autoPlayTimeout = isMultiCharacterWord ? levelData.autoPlayTimeout * 1.5 : levelData.autoPlayTimeout;
+      timeoutId = setTimeout(() => startAutoPlay(wordRef), autoPlayTimeout);
     }
   }
 };
