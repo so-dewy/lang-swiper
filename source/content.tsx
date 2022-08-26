@@ -64,7 +64,8 @@ const draggableRect = <div
     backgroundColor: "rgb(255, 255, 255)",
     boxShadow: "rgba(0, 8, 16, 0.08) 0px 4px 14px -2px",
     border: "1px rgba(0, 8, 16, 0.15) solid",
-    padding: 5
+    padding: 5,
+    zIndex: 9999999
   }}
   onDragStart={dragStartHandler} 
   draggable="true"
