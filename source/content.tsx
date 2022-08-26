@@ -166,6 +166,14 @@ const setWordRefEventListeners = (wordRef) => {
         { Translation(target) } 
       </div>
     );
+
+    const isMultiCharacterWord = wordRef.textContent.length > 1;
+    const wordMetadata = wordMetadataService.getWordMetadata(wordRef.textContent);
+    const levelData = WORD_LEVELS[wordMetadata.level];
+    if (autoPlayState.isAutoPlayOn && wordMetadata.level !== 0) {
+      const autoPlayTimeout = isMultiCharacterWord ? levelData.autoPlayTimeout * 1.5 : levelData.autoPlayTimeout;
+      timeoutId = setTimeout(() => startAutoPlay(wordRef), autoPlayTimeout);
+    }
   }, false);
 }
 
@@ -227,7 +235,7 @@ const init = async () => {
     if (!node.textContent) return;
 
     const mandarin = node.textContent.trim();
-    const span = <span style={{ display: "inline-block", textAlign: "start" }}></span>;
+    const span = <span style={{ display: "inline-block", textAlign: "start", textIndent: 0 }}></span>;
     const words: any = Array.from(segmenter.segment(mandarin));
   
     for (let word of words) {
