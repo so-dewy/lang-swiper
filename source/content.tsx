@@ -39,6 +39,10 @@ export const synthesizeWordSound = (word, language: TtsLanguages, shouldCancelPr
 let startX = 0;
 let startY = 0;
 const dragStartHandler = (event) => {
+  // Prevent some sites hijacking dragstart event so that my draggable rect is draggable :)
+  event.stopPropagation(); 
+  event.stopImmediatePropagation();
+
   startX = event.clientX - parseInt(window.getComputedStyle(draggableRect).left);
   startY = event.clientY - parseInt(window.getComputedStyle(draggableRect).top);
 }
