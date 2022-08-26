@@ -99,7 +99,7 @@ const WordTranslationList = (wordTranslation: WordTranslation) => {
         { ThirdPartyTranslationButtons(wordTranslation.word) }
       </div>
       <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
-        { wordTranslation.translation.map(el => <li style={{ listStyleType: "circle" }}>{ el }</li>) }
+        { wordTranslation.translation.map(el => <li style={{ listStyleType: "circle", marginBottom: 5 }}>{ el }</li>) }
       </ul>
     </>
   )
@@ -112,7 +112,7 @@ const ThirdPartyTranslationButtons = (word: string) => {
   const encodedWord = encodeURIComponent(word);
   return (
     <>
-      <div style={{ justifySelf: "right" }}>
+      <div style={{ justifySelf: "right", display: "flex", gap: 5 }}>
         <button 
           onMouseEnter={onMouseEnterHandler}
           onMouseLeave={onMouseLeaveHandler}
