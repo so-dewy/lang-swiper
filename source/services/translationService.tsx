@@ -6,7 +6,7 @@ import { WordRecognitionLevelButton, WORD_LEVELS } from '../components/WordRecog
 import { dictionary } from '../dictionary';
 import { getWordMetadata, setWordMetadata, WordMetadata } from '../services/wordMetadataService';
 import { AutoPlayButton } from '../components/AutoPlayButton';
-import { synthesizeWordSound, TtsLanguages } from '../content';
+import { autoPlayState, synthesizeWordSound, TtsLanguages } from '../content';
 
 interface WordTranslation {
   word: string,
@@ -14,15 +14,6 @@ interface WordTranslation {
   translation: string[],
   wordPartTranslations?: WordTranslation[]
 }
-
-const openTranslationPopup = (url) => {
-  const currentWindow = window;
-  const width = 1000;
-  const height = 500;
-  const left = currentWindow.screenX + (window.outerWidth - width) / 2;
-  const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
-  currentWindow.open(url, "", `width=${width},height=${height},left=${left},top=${top}`);
-};
 
 export const Translation = (wordElementRef: HTMLElement) => {  
   const word = wordElementRef.textContent;
@@ -51,11 +42,13 @@ export const Translation = (wordElementRef: HTMLElement) => {
     wordRecognitionButtons.push(WordRecognitionLevelButton({ level: i , isCurrentSavedLevel: i == wordMetadata.level, word: word, wordElementRef: wordElementRef }))
   }
   
+  const autoPlayButton = AutoPlayButton();
+
   let wordPartTranslations;
   if (wordTranslation.wordPartTranslations) {
     wordPartTranslations = wordTranslation.wordPartTranslations.map(el => (
       <>
-        { WordTranslationList(el) }
+        { WordTranslationList(el, autoPlayButton) }
         <br/>
       </>
     ));
@@ -72,7 +65,7 @@ export const Translation = (wordElementRef: HTMLElement) => {
             </div>
           )
         }
-        { AutoPlayButton() }
+        { autoPlayButton }
       </div>
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="preferredTranslation">Custom translation: </label>
@@ -80,7 +73,7 @@ export const Translation = (wordElementRef: HTMLElement) => {
         <input type="text" id="preferredTranslation" value={preferredTranslation} style={{ marginRight: 5 }}></input>
         <button onClick={(event) => savePreferredTranslation(event, word, wordMetadata) } >Save</button>
       </div>
-      { WordTranslationList(wordTranslation) }
+      { WordTranslationList(wordTranslation, autoPlayButton) }
       <br/>
       { wordPartTranslations }
     </>
@@ -88,7 +81,7 @@ export const Translation = (wordElementRef: HTMLElement) => {
 };
 
 
-const WordTranslationList = (wordTranslation: WordTranslation) => {
+const WordTranslationList = (wordTranslation: WordTranslation, autoPlayButtonRef) => {
   return (
     <>
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 30 }}>
@@ -96,7 +89,7 @@ const WordTranslationList = (wordTranslation: WordTranslation) => {
           <span style={{ fontSize: 25 }}>{ wordTranslation.word }</span> 
           <b>{ wordTranslation.pinyin ? wordTranslation.pinyin : "" }</b> 
         </div>
-        { ThirdPartyTranslationButtons(wordTranslation.word) }
+        { ThirdPartyTranslationButtons(wordTranslation.word, autoPlayButtonRef) }
       </div>
       <ul style={{ paddingLeft: 20, listStyleType: "circle" }}>
         { wordTranslation.translation.map(el => <li style={{ listStyleType: "circle", marginBottom: 5 }}>{ el }</li>) }
@@ -108,7 +101,21 @@ const WordTranslationList = (wordTranslation: WordTranslation) => {
 const onMouseEnterHandler = (event) => { (event.target as HTMLButtonElement).style.border = `1px solid #dddddd` }
 const onMouseLeaveHandler = (event) => { (event.target as HTMLButtonElement).style.border = `1px solid transparent` }
 
-const ThirdPartyTranslationButtons = (word: string) => { 
+const ThirdPartyTranslationButtons = (word: string, autoPlayButtonRef) => { 
+  const openTranslationPopup = (url) => {
+    if (autoPlayState.isAutoPlayOn) {
+      autoPlayState.toggleAutoPlay();
+      autoPlayButtonRef.style.border = `1px solid transparent`;
+    }
+  
+    const currentWindow = window;
+    const width = 1000;
+    const height = 500;
+    const left = currentWindow.screenX + (window.outerWidth - width) / 2;
+    const top = currentWindow.screenY + (window.outerHeight - height) / 2.5;
+    currentWindow.open(url, "", `width=${width},height=${height},left=${left},top=${top}`);
+  };
+
   const encodedWord = encodeURIComponent(word);
   return (
     <>
