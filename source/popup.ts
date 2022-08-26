@@ -21,8 +21,8 @@ browser.storage.local.get(null).then(data => {
     if (metadata && metadata.level && !isNaN(metadata.level)) {
       const level = +metadata.level;
       if (word.length == 1) {
-      counter[level - 1]++;
-    }
+        counter[level - 1]++;
+      }
       multiCharCounter[level - 1]++;
     }
   }
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const rows: any[] = [];
       for (const word of words) {
         const wordData = data[word];
-        if (wordData) {
+        if (wordData && wordData.level) {
           rows.push({
             word,
             level: wordData.level,
