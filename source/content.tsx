@@ -8,6 +8,9 @@ import browser from 'webextension-polyfill';
 import * as Papa from 'papaparse';
 import optionsStorage from './options-storage.js';
 import { WordMetadata } from './services/wordMetadataService';
+import { Segment, useDefault } from 'segmentit';
+ 
+const segmentit = useDefault(new Segment());
 
 // @ts-ignore
 const segmenter = new Intl.Segmenter(['zh'], {
@@ -236,16 +239,18 @@ const init = async () => {
 
     const mandarin = node.textContent.trim();
     const span = <span style={{ display: "inline-block", textAlign: "start", textIndent: 0 }}></span>;
-    const words: any = Array.from(segmenter.segment(mandarin));
-  
+
+    const words = segmentit.doSegment(mandarin, {
+      simple: true
+    });
+    
     for (let word of words) {
-      word = word.segment;
       const wordRef = <span>{word}</span>;
       wordRef.after(span);
       span.appendChild(wordRef);
-  
+
       if (punctuation.has(word) || !(/\p{Script=Han}/u.test(word))) continue;
-  
+
       wordRefs.push(wordRef);
       wordRef.className = "word-tooltip";
       setWordRefEventListeners(wordRef);
@@ -253,7 +258,7 @@ const init = async () => {
     (node as ChildNode).after(span);
     (node as ChildNode).remove();
   });
-
+  
   await wordMetadataService.loadMetadataFromStorage(wordRefs.map(wordRef => wordRef.textContent ? wordRef.textContent : ""));
   const unsetWords = {};
   wordRefs.forEach(wordRef => {
