@@ -1,44 +1,35 @@
-# browser-extension-template
-
-[link-webext-polyfill]: https://github.com/mozilla/webextension-polyfill
-[link-rgh]: https://github.com/sindresorhus/refined-github
-[link-ngh]: https://github.com/sindresorhus/notifier-for-github
-[link-hfog]: https://github.com/sindresorhus/hide-files-on-github
-[link-tsconfig]: https://github.com/sindresorhus/tsconfig
-[link-options-sync]: https://github.com/fregante/webext-options-sync
-[link-cws-keys]: https://github.com/DrewML/chrome-webstore-upload/blob/master/How%20to%20generate%20Google%20API%20keys.md
-[link-amo-keys]: https://addons.mozilla.org/en-US/developers/addon/api/key
-
-> Cross-browser extension boilerplate - barebones template with Parcel 2, options handler and auto-publishing.
-
-Screenshot of extension options:
-
-![Sample extension options output](media/previewer.png)
-
+# LangSwiper - Language learner's helper (Mandarin to English only currently)
+This tool's purpose it to help aquire vocabulary by going head first into reading foreign language texts, books on the websites. 
+## Video preview
+TODO
+## Screenshots
+TODO
 ## Features
+- Word translation in a popup (works without internet)
+- Autoplay mode will read out loud the pronunciation and translation to you, then after a some time (configurable in options) move to the next word
+- 4 levels of word recognition, higher levels are skipped faster
+- Import\export of the words you studied with their levels
+## Motivation for this extension
+When I was a teenager I was reading a lot of foreign novels but often the translations were dropped midway. After this happening again I thought: "Screw it, I'm just going to read the rest in English". 
 
-- Uses Manifest v3 ([not yet compatible with Firefox](https://bugzilla.mozilla.org/show_bug.cgi?id=1578284))
-- Use npm dependencies thanks to Parcel 2.
-- Use modern promise-based `browser.*` APIs [webextension-polyfill][link-webext-polyfill].
-- [Auto-syncing options](#auto-syncing-options).
-- [Auto-publishing](#publishing) with auto-versioning and support for manual releases.
-- [Extensive configuration documentation](#configuration).
+So I went and did just that, using only Google Translate extension to translate individual words I didn't know. It was hard at the start because I barely knew any English but because I really wanted to finish the book I went on. Surprisingly to me my vocabulary improved by leaps and bounds, I could feel the progress and I was addicted to this feeling. Lo and behold about a year and a half in I was easily reading books in English rarely looking up unknown words. As often I started to guess the meaning of new words by context.
+
+Right now I really miss that feeling of rapid language acquisition. Wrist pain (RSI) prevents me from using the old method. Because to translate the word you have to double click it to highlight and click on translation popup button (ouch).
+
+Thus this extension was born, I developed a way to make browser automatically show the word translation, read it out loud and then move to the next word after some time. Reducing hand input to the minimum. That feeling of fast progrees unlocked again.
 
 ## Getting started
+### 🛠 Build and install prod extension file (.crx) locally
 
-### 1️⃣ Create your own copy
-
-1. Click [<kbd>Use this template</kbd>](https://github.com/fregante/browser-extension-template/generate) to make a copy of your own. 😉
-
-### 🛠 Build locally
-
-1. Checkout the copied repository to your local machine eg. with `git clone https://github.com/my-username/my-awesome-extension/`
+1. Checkout the copied repository to your local machine eg. with `git clone https://github.com/so-dewy/lang-swiper/`
 1. Run `npm install` to install all required dependencies
-1. Run `npm run build`
+1. Run `npm run build` to create the `distribution` folder, this folder will contain the generated extension code
+1. In Chrome navigate to `chrome://extensions/`
+1. Click `Pack extension` button and set path to `distribution` folder and generate .crx file
+1. Navigate to the generated .crx file on your computer
+1. Drag the .crx file onto browser window. The extension should be up and running
 
-The build step will create the `distribution` folder, this folder will contain the generated extension.
-
-### 🏃 Run the extension
+### 🏃 Run the extension in developer mode
 
 Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) is recommened for automatic reloading and running in a dedicated browser instance. Alternatively you can load the extension manually (see below).
 
@@ -47,22 +38,12 @@ Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-star
 1. In another terminal, run `web-ext run -t chromium --arg="--window-size=1920,1080" --arg="--auto-open-devtools-for-tabs"`
 1. Check that the extension is loaded by opening the extension options ([in Firefox](media/extension_options_firefox.png) or [in Chrome](media/extension_options_chrome.png)).
 
-#### Manually
-
-You can also [load the extension manually in Chrome](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#google-chrome-opera-vivaldi) or [Firefox](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#mozilla-firefox).
-
 ## TODO
+- [ ] Button to close translation popup
 - [ ] Word colors config
 - [ ] TTS voices config (which voice, rate)
-- [ ] Profile laggy pages
-- [ ] Word tracker mode on/off (maybe by a hotkey)
-- [ ] Hover translate mode on/off (maybe by a hotkey)
+- [ ] Extension on/off mode (maybe by a hotkey) for user convenience
 - [ ] Convert CEDICT dictionary to JSON (for faster load time?) instead of parsing this txt file line by line. Research background page capabilites for this, maybe it can be cached there instead of loading it on every refresh of the page
-- [ ] Style popup more professionally
+- [ ] Style translation popup and stats popup more professionally
 - [ ] Investigate funky styling on this page https://reject.tokyo/uncaught-error-extension-context-invalidated/
-- [ ] Investigate why tts doesn't start until open dev tools
 - [ ] Fix baidu popup
-- [ ] Option to not tts words above configured level
-Known words are skipped faster
-- [ ] Fix empty translation items
-- [ ] Fix autoplay turn off bug
